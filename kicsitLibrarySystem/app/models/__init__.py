@@ -12,6 +12,7 @@ from app.models.catalog import (
 from app.models.consumers import Employee, Student
 from app.models.circulation import Fine, IssueRecord, ReceiveRecord
 from app.models.phase5 import DamagedBook, LostBook, Notification, Reservation
+from app.models.phase7 import ImportBatch, ImportErrorRow
 
 __all__ = [
     "ActivityLog",
@@ -24,6 +25,8 @@ __all__ = [
     "DepartmentCategory",
     "Employee",
     "Fine",
+    "ImportBatch",
+    "ImportErrorRow",
     "IssueRecord",
     "LiteratureCategory",
     "LostBook",
