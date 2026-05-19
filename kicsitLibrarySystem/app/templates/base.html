@@ -17,18 +17,10 @@
         </div>
       </div>
       <nav class="nav-list">
-        <a class="nav-item active" href="/dashboard">Dashboard</a>
-        <span class="nav-item disabled">Library Catalog</span>
-        <span class="nav-item disabled">Book Copies</span>
-        <span class="nav-item disabled">Consumers</span>
-        <span class="nav-item disabled">Issue Return</span>
-        <span class="nav-item disabled">Reservations</span>
-        <span class="nav-item disabled">Overdue</span>
-        <span class="nav-item disabled">Fines</span>
-        <span class="nav-item disabled">Reports</span>
-        <span class="nav-item disabled">Settings</span>
-        <span class="nav-item disabled">Users</span>
-        <span class="nav-item disabled">Logs</span>
+        <a class="nav-item {% if active_nav == 'dashboard' or active_nav is not defined %}active{% endif %}" href="/dashboard">Dashboard</a>
+        <a class="nav-item {% if active_nav == 'catalog' %}active{% endif %}" href="/catalog">Library Catalog</a>
+        <a class="nav-item {% if active_nav == 'copies' %}active{% endif %}" href="/catalog/copies">Book Copies</a>
+        <a class="nav-item {% if active_nav == 'catalog_setup' %}active{% endif %}" href="/catalog/setup">Catalog Setup</a>
       </nav>
     </aside>
 
@@ -52,4 +44,3 @@
   <script src="{{ url_for('static', path='/js/app.js') }}"></script>
 </body>
 </html>
-

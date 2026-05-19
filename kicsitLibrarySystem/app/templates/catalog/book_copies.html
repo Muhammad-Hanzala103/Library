@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Book Copies - {{ app_name }}{% endblock %}
+{% block page_title %}Book Copies{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2>Add Accession Copy</h2>
+    <a class="text-link" href="/catalog">Manage books</a>
+  </div>
+  {% if error %}
+  <div class="form-alert" role="alert">{{ error }}</div>
+  {% endif %}
+  <form method="post" action="/catalog/copies" class="data-form compact">
+    <div class="form-grid">
+      <label class="wide">
+        Book
+        <select name="book_master_id" required>
+          <option value="">Select book</option>
+          {% for book in books %}
+          <option value="{{ book.id }}">{{ book.title }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Accession number
+        <input name="accession_number" required>
+      </label>
+      <label>
+        Copy number
+        <input name="copy_number" type="number" min="1" value="1" required>
+      </label>
+      <label>
+        Barcode value
+        <input name="barcode_value">
+      </label>
+      <label>
+        Status
+        <select name="status_value">
+          <option>Available</option>
+          <option>Issued</option>
+          <option>Reserved</option>
+          <option>Overdue</option>
+          <option>Lost</option>
+          <option>Damaged</option>
+          <option>Missing</option>
+          <option>Repairing</option>
+        </select>
+      </label>
+      <label>
+        Condition
+        <input name="physical_condition" value="Good">
+      </label>
+      <label>
+        Location
+        <input name="location">
+      </label>
+      <label>
+        Rack
+        <input name="rack">
+      </label>
+      <label>
+        Shelf
+        <input name="shelf">
+      </label>
+      <label>
+        Hall
+        <input name="hall">
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Add Copy</button>
+    </div>
+  </form>
+</section>
+
+<section class="toolbar">
+  <form method="get" action="/catalog/copies" class="search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search accession, title, barcode, rack, shelf">
+    <button type="submit">Search</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Accession Register</h2>
+    <span>{{ copies | length }} record(s)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Accession</th>
+          <th>Book</th>
+          <th>Status</th>
+          <th>Condition</th>
+          <th>Location</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for copy in copies %}
+        <tr>
+          <td>{{ copy.accession_number }}</td>
+          <td><a class="text-link" href="/catalog/{{ copy.book_master.id }}">{{ copy.book_master.title }}</a></td>
+          <td>{{ copy.status }}</td>
+          <td>{{ copy.physical_condition }}</td>
+          <td>{{ copy.location or "" }} {{ copy.rack or "" }} {{ copy.shelf or "" }} {{ copy.hall or "" }}</td>
+          <td>
+            <form method="post" action="/catalog/copies/{{ copy.id }}/delete" class="inline-delete-form">
+              <input name="reason" placeholder="Deletion reason" required>
+              <button class="danger-button small" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">No accession copies found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

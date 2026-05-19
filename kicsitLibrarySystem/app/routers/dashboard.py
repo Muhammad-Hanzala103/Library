@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
-from app.models import ActivityLog, Permission, Role, User
+from app.models import ActivityLog, BookCopy, BookMaster, Permission, Role, User
 from app.permissions import require_permission
 from app.services.auth_service import get_user_permission_codes
 
@@ -27,6 +27,8 @@ def dashboard_home(
         "roles": db.scalar(select(func.count(Role.id))) or 0,
         "permissions": db.scalar(select(func.count(Permission.id))) or 0,
         "activity_logs": db.scalar(select(func.count(ActivityLog.id))) or 0,
+        "books": db.scalar(select(func.count(BookMaster.id)).where(BookMaster.is_deleted == False)) or 0,  # noqa: E712
+        "copies": db.scalar(select(func.count(BookCopy.id)).where(BookCopy.is_deleted == False)) or 0,  # noqa: E712
     }
     recent_logs = db.scalars(select(ActivityLog).order_by(ActivityLog.created_at.desc()).limit(8)).all()
     permissions = get_user_permission_codes(current_user)
@@ -41,4 +43,3 @@ def dashboard_home(
             "recent_logs": recent_logs,
         },
     )
-

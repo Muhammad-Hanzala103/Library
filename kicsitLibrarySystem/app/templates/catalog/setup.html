@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Catalog Setup - {{ app_name }}{% endblock %}
+{% block page_title %}Catalog Setup{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="form-alert" role="alert">{{ error }}</div>
+{% endif %}
+
+<section class="setup-grid">
+  <article class="panel">
+    <h2>Authors</h2>
+    <form method="post" action="/catalog/setup/authors" class="stack-form">
+      <input name="name" placeholder="Author name" required>
+      <input name="description" placeholder="Description">
+      <button type="submit">Add Author</button>
+    </form>
+    <ul class="plain-list">{% for item in references.authors %}<li>{{ item.name }}</li>{% endfor %}</ul>
+  </article>
+
+  <article class="panel">
+    <h2>Publishers</h2>
+    <form method="post" action="/catalog/setup/publishers" class="stack-form">
+      <input name="name" placeholder="Publisher name" required>
+      <input name="city" placeholder="City">
+      <input name="country" placeholder="Country">
+      <input name="contact" placeholder="Contact">
+      <button type="submit">Add Publisher</button>
+    </form>
+    <ul class="plain-list">{% for item in references.publishers %}<li>{{ item.name }}</li>{% endfor %}</ul>
+  </article>
+
+  <article class="panel">
+    <h2>General Categories</h2>
+    <form method="post" action="/catalog/setup/categories" class="stack-form">
+      <input name="name" placeholder="Category name" required>
+      <input name="code" placeholder="Code">
+      <input name="description" placeholder="Description">
+      <button type="submit">Add Category</button>
+    </form>
+    <ul class="plain-list">{% for item in references.categories %}<li>{{ item.name }}</li>{% endfor %}</ul>
+  </article>
+
+  <article class="panel">
+    <h2>Department Categories</h2>
+    <form method="post" action="/catalog/setup/department-categories" class="stack-form">
+      <input name="name" placeholder="Department name" required>
+      <input name="code" placeholder="Code">
+      <input name="description" placeholder="Description">
+      <button type="submit">Add Department</button>
+    </form>
+    <ul class="plain-list">{% for item in references.department_categories %}<li>{{ item.name }}</li>{% endfor %}</ul>
+  </article>
+
+  <article class="panel">
+    <h2>Literature Categories</h2>
+    <form method="post" action="/catalog/setup/literature-categories" class="stack-form">
+      <input name="name" placeholder="Literature name" required>
+      <input name="code" placeholder="Code">
+      <input name="description" placeholder="Description">
+      <button type="submit">Add Literature</button>
+    </form>
+    <ul class="plain-list">{% for item in references.literature_categories %}<li>{{ item.name }}</li>{% endfor %}</ul>
+  </article>
+</section>
+{% endblock %}
+

@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.config import get_settings
 from app.routers import auth as auth_router
+from app.routers import catalog
 from app.routers import dashboard
 
 
@@ -17,6 +18,7 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
     app.include_router(auth_router.router)
     app.include_router(dashboard.router)
+    app.include_router(catalog.router)
 
     @app.get("/", include_in_schema=False)
     def home() -> RedirectResponse:
@@ -46,4 +48,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

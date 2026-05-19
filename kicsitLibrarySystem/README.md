@@ -140,3 +140,31 @@ Seed users:
 | Assistant Librarian | `assistant` | `assistant@kicsit.local` | `ChangeMe@123` |
 
 Change these passwords before production use.
+
+## Phase 2 Catalog Commands
+
+After Phase 1 is running, apply the catalog migration and refresh seed data:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 2 adds:
+
+- Authors
+- Publishers
+- General categories
+- Department categories
+- Literature categories
+- Book master records
+- Accession copies
+- Unique accession number validation
+- JPG and PNG book image upload
+- Location, rack, shelf, and hall fields
+- Basic catalog search
+- CSV import template download
+- Activity logs for add, edit, and delete actions

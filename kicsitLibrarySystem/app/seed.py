@@ -2,6 +2,7 @@ from sqlalchemy import select
 
 from app.database import SessionLocal
 from app.models import Permission, Role, User
+from app.models import Category, DepartmentCategory, LiteratureCategory
 from app.utils.security import hash_password
 
 
@@ -90,6 +91,18 @@ def seed() -> None:
         for username, email, full_name, role_name in SEED_USERS:
             get_or_create_user(db, username, email, full_name, roles_by_name[role_name])
 
+        for name, code in [("Programming", "PROGRAMMING"), ("Artificial Intelligence", "AI"), ("Networking", "NETWORKING"), ("Database", "DATABASE")]:
+            if db.scalar(select(Category).where(Category.name == name)) is None:
+                db.add(Category(name=name, code=code, description=f"Default category: {name}"))
+
+        for name, code in [("CS", "CS"), ("CE", "CE")]:
+            if db.scalar(select(DepartmentCategory).where(DepartmentCategory.name == name)) is None:
+                db.add(DepartmentCategory(name=name, code=code, description=f"Default department category: {name}"))
+
+        for name, code in [("Urdu", "URDU"), ("English", "ENGLISH"), ("History", "HISTORY"), ("Islam", "ISLAM")]:
+            if db.scalar(select(LiteratureCategory).where(LiteratureCategory.name == name)) is None:
+                db.add(LiteratureCategory(name=name, code=code, description=f"Default literature category: {name}"))
+
         db.commit()
         print("Seed completed.")
         print("Default password for seed users: ChangeMe@123")
@@ -99,4 +112,3 @@ def seed() -> None:
 
 if __name__ == "__main__":
     seed()
-

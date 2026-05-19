@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     session_cookie_name: str = "kicsit_access_token"
     secure_cookies: bool = False
+    max_upload_size_mb: int = 5
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -30,8 +31,11 @@ class Settings(BaseSettings):
             "?charset=utf8mb4"
         )
 
+    @property
+    def max_upload_size_bytes(self) -> int:
+        return self.max_upload_size_mb * 1024 * 1024
+
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

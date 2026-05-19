@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Books - {{ app_name }}{% endblock %}
+{% block page_title %}Manage Books{% endblock %}
+
+{% block content %}
+<section class="toolbar">
+  <form method="get" action="/catalog" class="search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search title, author, ISBN, ISSN, accession number">
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/catalog/import-template">Import Template</a>
+    <a class="button secondary" href="/catalog/setup">Catalog Setup</a>
+    <a class="button" href="/catalog/new">Add New Book</a>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Library Catalog</h2>
+    <span>{{ books | length }} record(s)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Authors</th>
+          <th>Department</th>
+          <th>Category</th>
+          <th>Location</th>
+          <th>Copies</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in books %}
+        <tr>
+          <td>
+            <strong>{{ book.title }}</strong>
+            <small>{{ book.isbn or book.issn or "" }}</small>
+          </td>
+          <td>{{ book.authors | map(attribute='name') | join(', ') }}</td>
+          <td>{{ book.department_category.name if book.department_category else "" }}</td>
+          <td>{{ book.category.name if book.category else "" }}</td>
+          <td>{{ book.book_location or "" }} {{ book.rack or "" }} {{ book.shelf or "" }}</td>
+          <td>{{ book.copies | selectattr('is_deleted', 'equalto', false) | list | length }}</td>
+          <td class="row-actions">
+            <a href="/catalog/{{ book.id }}">View</a>
+            <a href="/catalog/{{ book.id }}/edit">Edit</a>
+            <a class="danger-link" href="/catalog/{{ book.id }}/delete">Delete</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7">No books found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

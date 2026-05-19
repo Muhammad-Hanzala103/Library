@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}View Book - {{ app_name }}{% endblock %}
+{% block page_title %}View Book{% endblock %}
+
+{% block content %}
+<section class="book-view">
+  <article class="panel">
+    <div class="panel-header">
+      <h2>{{ book.title }}</h2>
+      <div class="toolbar-actions">
+        <a class="button secondary" href="/catalog/{{ book.id }}/edit">Edit</a>
+        <a class="button danger" href="/catalog/{{ book.id }}/delete">Delete</a>
+      </div>
+    </div>
+    <div class="book-detail-grid">
+      <div>
+        {% if book.book_image_filename %}
+        <img class="book-cover" src="/catalog/book-images/{{ book.book_image_filename }}" alt="Book cover for {{ book.title }}">
+        {% else %}
+        <div class="book-cover placeholder">No Image</div>
+        {% endif %}
+      </div>
+      <div class="detail-list">
+        <div><span>Authors</span><strong>{{ book.authors | map(attribute='name') | join(', ') }}</strong></div>
+        <div><span>Publisher</span><strong>{{ book.publisher.name if book.publisher else "" }}</strong></div>
+        <div><span>ISBN / ISSN</span><strong>{{ book.isbn or "" }} {{ book.issn or "" }}</strong></div>
+        <div><span>Department</span><strong>{{ book.department_category.name if book.department_category else "" }}</strong></div>
+        <div><span>Literature</span><strong>{{ book.literature_category.name if book.literature_category else "" }}</strong></div>
+        <div><span>Category</span><strong>{{ book.category.name if book.category else "" }}</strong></div>
+        <div><span>Location</span><strong>{{ book.book_location or "" }} {{ book.rack or "" }} {{ book.shelf or "" }} {{ book.hall or "" }}</strong></div>
+        <div><span>Description</span><strong>{{ book.description or "" }}</strong></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Accession Copies</h2>
+      <a class="text-link" href="/catalog/copies">Manage copies</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Accession</th>
+            <th>Copy</th>
+            <th>Status</th>
+            <th>Location</th>
+            <th>Condition</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for copy in book.copies if not copy.is_deleted %}
+          <tr>
+            <td>{{ copy.accession_number }}</td>
+            <td>{{ copy.copy_number }}</td>
+            <td>{{ copy.status }}</td>
+            <td>{{ copy.location or "" }} {{ copy.rack or "" }} {{ copy.shelf or "" }} {{ copy.hall or "" }}</td>
+            <td>{{ copy.physical_condition }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5">No accession copies added yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+{% endblock %}
+
