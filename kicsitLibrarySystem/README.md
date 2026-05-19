@@ -224,3 +224,30 @@ Phase 4 adds:
 - Issue receive history
 - Printable issue and return slips
 - Activity logs for issue and return
+
+## Phase 5 Reservation and Fine Commands
+
+After Phase 4 is running:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 5 adds:
+
+- Queue based reservations
+- Reservation status flow
+- Overdue dashboard
+- Unpaid fines management
+- Lost books
+- Damaged books
+- Reminder notification records
+- WhatsApp placeholder notification records
+- Overdue PDF export
+- Overdue Excel export
+- Activity logs for reservation, reminders, fine payment, lost, and damaged actions

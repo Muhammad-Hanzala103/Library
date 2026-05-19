@@ -445,6 +445,17 @@ button,
   gap: 8px;
 }
 
+.inline-form {
+  display: inline-flex;
+  margin-right: 6px;
+}
+
+.small-button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
 .setup-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(260px, 1fr));
