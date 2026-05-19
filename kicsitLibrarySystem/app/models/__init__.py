@@ -11,6 +11,7 @@ from app.models.catalog import (
 )
 from app.models.consumers import Employee, Student
 from app.models.circulation import Fine, IssueRecord, ReceiveRecord
+from app.models.phase5 import DamagedBook, LostBook, Notification, Reservation
 
 __all__ = [
     "ActivityLog",
@@ -19,14 +20,18 @@ __all__ = [
     "BookCopy",
     "BookMaster",
     "Category",
+    "DamagedBook",
     "DepartmentCategory",
     "Employee",
     "Fine",
     "IssueRecord",
     "LiteratureCategory",
+    "LostBook",
+    "Notification",
     "Permission",
     "Publisher",
     "ReceiveRecord",
+    "Reservation",
     "Role",
     "RolePermission",
     "Student",
