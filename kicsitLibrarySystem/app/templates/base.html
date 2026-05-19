@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <span class="brand-mark">K</span>
+        <div>
+          <strong>KICSIT Library</strong>
+          <small>Management System</small>
+        </div>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-item active" href="/dashboard">Dashboard</a>
+        <span class="nav-item disabled">Library Catalog</span>
+        <span class="nav-item disabled">Book Copies</span>
+        <span class="nav-item disabled">Consumers</span>
+        <span class="nav-item disabled">Issue Return</span>
+        <span class="nav-item disabled">Reservations</span>
+        <span class="nav-item disabled">Overdue</span>
+        <span class="nav-item disabled">Fines</span>
+        <span class="nav-item disabled">Reports</span>
+        <span class="nav-item disabled">Settings</span>
+        <span class="nav-item disabled">Users</span>
+        <span class="nav-item disabled">Logs</span>
+      </nav>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Dr A Q Khan Institute of Computer Sciences and Information Technology</p>
+          <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="user-chip">{{ current_user.full_name if current_user else "Guest" }}</span>
+          <a class="logout-link" href="/logout">Logout</a>
+        </div>
+      </header>
+
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+</body>
+</html>
+

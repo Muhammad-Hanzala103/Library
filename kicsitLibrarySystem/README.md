@@ -94,17 +94,49 @@ kicsitLibrarySystem/
   tests/
 ```
 
-## Next Phase
+## Phase 1 Run Commands
 
-Phase 1 should create the runnable FastAPI foundation:
+Create and activate a virtual environment from the project folder:
 
-- Python package files
-- configuration
-- database connection
-- dependency setup
-- Alembic initialization
-- base models setup
-- authentication foundation
-- seed plan
-- first smoke tests
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
 
+Create `.env` from `.env.example`, then create the MySQL database in MySQL Workbench:
+
+```sql
+CREATE DATABASE kicsit_library CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Apply migrations and seed users:
+
+```powershell
+alembic upgrade head
+python -m app.seed
+```
+
+Run the application:
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000/login
+```
+
+Seed users:
+
+| Role | Username | Email | Password |
+| --- | --- | --- | --- |
+| Super Admin | `superadmin` | `superadmin@kicsit.local` | `ChangeMe@123` |
+| Admin | `admin` | `admin@kicsit.local` | `ChangeMe@123` |
+| Librarian | `librarian` | `librarian@kicsit.local` | `ChangeMe@123` |
+| Assistant Librarian | `assistant` | `assistant@kicsit.local` | `ChangeMe@123` |
+
+Change these passwords before production use.

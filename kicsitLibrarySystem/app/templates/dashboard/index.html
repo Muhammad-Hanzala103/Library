@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ app_name }}{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="metric-grid" aria-label="Phase 1 dashboard metrics">
+  <article class="metric-card">
+    <span>Total Users</span>
+    <strong>{{ metrics.users }}</strong>
+  </article>
+  <article class="metric-card">
+    <span>Roles</span>
+    <strong>{{ metrics.roles }}</strong>
+  </article>
+  <article class="metric-card">
+    <span>Permissions</span>
+    <strong>{{ metrics.permissions }}</strong>
+  </article>
+  <article class="metric-card">
+    <span>Activity Logs</span>
+    <strong>{{ metrics.activity_logs }}</strong>
+  </article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Current Access</h2>
+      <span>{{ current_user.username }}</span>
+    </div>
+    <div class="detail-list">
+      <div>
+        <span>Name</span>
+        <strong>{{ current_user.full_name }}</strong>
+      </div>
+      <div>
+        <span>Email</span>
+        <strong>{{ current_user.email }}</strong>
+      </div>
+      <div>
+        <span>Roles</span>
+        <strong>{{ current_user.roles | map(attribute='name') | join(', ') }}</strong>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-header">
+      <h2>Enabled Permissions</h2>
+      <span>{{ permissions | length }}</span>
+    </div>
+    <div class="permission-list">
+      {% for permission in permissions | sort %}
+      <span>{{ permission }}</span>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Recent Activity</h2>
+    <span>Latest 8</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Action</th>
+          <th>Module</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in recent_logs %}
+        <tr>
+          <td>{{ log.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td>{{ log.action }}</td>
+          <td>{{ log.module }}</td>
+          <td>{{ log.description or "" }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4">No activity logged yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
