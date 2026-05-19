@@ -13,9 +13,11 @@ from app.models.consumers import Employee, Student
 from app.models.circulation import Fine, IssueRecord, ReceiveRecord
 from app.models.phase5 import DamagedBook, LostBook, Notification, Reservation
 from app.models.phase7 import ImportBatch, ImportErrorRow
+from app.models.phase8 import AuditRecord, Document, InventoryItem, NewArrival, VisitRecord
 
 __all__ = [
     "ActivityLog",
+    "AuditRecord",
     "Author",
     "BookAuthor",
     "BookCopy",
@@ -23,13 +25,16 @@ __all__ = [
     "Category",
     "DamagedBook",
     "DepartmentCategory",
+    "Document",
     "Employee",
     "Fine",
     "ImportBatch",
     "ImportErrorRow",
+    "InventoryItem",
     "IssueRecord",
     "LiteratureCategory",
     "LostBook",
+    "NewArrival",
     "Notification",
     "Permission",
     "Publisher",
@@ -40,4 +45,5 @@ __all__ = [
     "Student",
     "User",
     "UserRole",
+    "VisitRecord",
 ]
