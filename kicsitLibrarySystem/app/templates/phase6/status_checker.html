@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Status Checker - {{ app_name }}{% endblock %}
+{% block page_title %}Status Consistency Checker{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Mismatch Report</h2><span>{{ mismatches|length }} issue(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Accession</th><th>Current</th><th>Mismatch</th><th>Detail</th><th>Correction</th></tr></thead><tbody>
+  {% for item in mismatches %}
+  <tr>
+    <td>{{ item.copy.accession_number }}</td><td>{{ item.copy.status }}</td><td>{{ item.type }}</td><td>{{ item.detail }}</td>
+    <td><form method="post" action="/status-checker/{{ item.copy.id }}/correct" class="inline-delete-form"><select name="new_status"><option>{{ item.expected_status }}</option><option>Available</option><option>Issued</option><option>Reserved</option><option>Lost</option><option>Damaged</option></select><input name="reason" placeholder="Correction reason" required><button class="small-button" type="submit">Correct</button></form></td>
+  </tr>
+  {% else %}<tr><td colspan="5">No mismatches found.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
+

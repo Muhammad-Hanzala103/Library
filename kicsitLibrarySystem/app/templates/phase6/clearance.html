@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Student Clearance - {{ app_name }}{% endblock %}
+{% block page_title %}Student Clearance{% endblock %}
+{% block content %}
+<section class="toolbar">
+  <form method="get" class="search-form">
+    <input name="q" value="{{ q }}" placeholder="Registration number, admission number, or name">
+    <button type="submit">Search Student</button>
+  </form>
+</section>
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+{% if student and context %}
+<section class="panel">
+  <div class="panel-header"><h2>{{ student.name }}</h2><span>{{ student.registration_number }}</span></div>
+  <div class="detail-list two-col">
+    <div><span>Status</span><strong>{{ student.status }}</strong></div>
+    <div><span>Clearance</span><strong>{{ student.clearance_status }}</strong></div>
+    <div><span>Department</span><strong>{{ student.department or "" }}</strong></div>
+    <div><span>Page / Register</span><strong>{{ student.page_number or "" }} / {{ student.register_number or "" }}</strong></div>
+  </div>
+  {% if context.blockers %}
+  <div class="form-alert"><strong>Clearance blocked:</strong> {{ context.blockers | join(" ") }}</div>
+  {% else %}
+  <form method="post" action="/clearance/{{ student.id }}/clear" class="data-form">
+    <label class="wide">Clearance remarks<textarea name="remarks" rows="3" required></textarea></label>
+    <div class="form-actions"><button type="submit">Clear Student</button><a class="button secondary" href="/clearance/{{ student.id }}/pdf">Generate PDF</a></div>
+  </form>
+  {% endif %}
+  {% if student.clearance_status == "Cleared" %}<a class="button secondary" href="/clearance/{{ student.id }}/pdf">Generate Clearance PDF</a>{% endif %}
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel"><div class="panel-header"><h2>Issue History</h2><span>{{ context.issues|length }}</span></div><div class="table-wrap"><table><thead><tr><th>Book</th><th>Accession</th><th>Issue</th><th>Due</th><th>Status</th></tr></thead><tbody>{% for item in context.issues %}<tr><td>{{ item.book_master.title }}</td><td>{{ item.book_copy.accession_number }}</td><td>{{ item.issue_date }}</td><td>{{ item.due_date }}</td><td>{{ item.status }}</td></tr>{% else %}<tr><td colspan="5">No issues.</td></tr>{% endfor %}</tbody></table></div></article>
+  <article class="panel"><div class="panel-header"><h2>Return History</h2><span>{{ context.returns|length }}</span></div><div class="table-wrap"><table><thead><tr><th>Accession</th><th>Receive</th><th>Fine</th></tr></thead><tbody>{% for item in context.returns %}<tr><td>{{ item.book_copy.accession_number }}</td><td>{{ item.receive_date }}</td><td>{{ item.calculated_fine_amount }}</td></tr>{% else %}<tr><td colspan="3">No returns.</td></tr>{% endfor %}</tbody></table></div></article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel"><div class="panel-header"><h2>Overdue</h2><span>{{ context.overdue_history|length }}</span></div><ul class="plain-list">{% for item in context.overdue_history %}<li>{{ item.book_copy.accession_number }} - due {{ item.due_date }}</li>{% else %}<li>No overdue active issues.</li>{% endfor %}</ul></article>
+  <article class="panel"><div class="panel-header"><h2>Unpaid Fines</h2><span>{{ context.unpaid_fines|length }}</span></div><ul class="plain-list">{% for item in context.unpaid_fines %}<li>{{ item.fine_number }} - {{ item.remaining_amount }}</li>{% else %}<li>No unpaid fines.</li>{% endfor %}</ul></article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel"><div class="panel-header"><h2>Lost Cases</h2><span>{{ context.lost_cases|length }}</span></div><ul class="plain-list">{% for item in context.lost_cases %}<li>{{ item.book_copy.accession_number }} - {{ item.payment_status }}</li>{% else %}<li>No unresolved lost cases.</li>{% endfor %}</ul></article>
+  <article class="panel"><div class="panel-header"><h2>Damaged Cases</h2><span>{{ context.damaged_cases|length }}</span></div><ul class="plain-list">{% for item in context.damaged_cases %}<li>{{ item.book_copy.accession_number }} - {{ item.damage_level }}</li>{% else %}<li>No unresolved damaged cases.</li>{% endfor %}</ul></article>
+</section>
+{% elif q %}
+<section class="panel"><p>No student found.</p></section>
+{% endif %}
+{% endblock %}
+

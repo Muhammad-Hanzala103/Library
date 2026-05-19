@@ -251,3 +251,27 @@ Phase 5 adds:
 - Overdue PDF export
 - Overdue Excel export
 - Activity logs for reservation, reminders, fine payment, lost, and damaged actions
+
+## Phase 6 Clearance and History Commands
+
+After Phase 5 is running:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 6 adds:
+
+- Student clearance screen
+- Clearance blocker checks for active issues, unpaid fines, unresolved lost cases, and unresolved damaged cases
+- Clearance PDF
+- Book history by accession number
+- Issued and returned counts
+- In-library check by selected date
+- Status consistency checker
+- Authorized status correction with reason

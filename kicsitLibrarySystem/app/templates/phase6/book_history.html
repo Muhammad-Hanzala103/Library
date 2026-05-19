@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Book History - {{ app_name }}{% endblock %}
+{% block page_title %}Book History{% endblock %}
+{% block content %}
+<section class="toolbar"><form method="get" class="search-form"><input name="accession_number" value="{{ accession_number }}" placeholder="Accession number"><input type="date" name="selected_date" value="{{ selected_date }}"><button type="submit">Search</button></form></section>
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+{% if history %}
+<section class="panel">
+  <div class="panel-header"><h2>{{ history.copy.book_master.title }}</h2><span>{{ history.copy.accession_number }}</span></div>
+  <div class="metric-grid">
+    <article class="metric-card"><span>Current Status</span><strong>{{ history.copy.status }}</strong></article>
+    <article class="metric-card"><span>Issued Count</span><strong>{{ history.issued_count }}</strong></article>
+    <article class="metric-card"><span>Returned Count</span><strong>{{ history.returned_count }}</strong></article>
+    <article class="metric-card"><span>In Library on {{ history.selected_date }}</span><strong>{{ "Yes" if history.in_library else "No" }}</strong></article>
+  </div>
+  {% if history.holder %}<p>Holder on selected date: <strong>{{ history.holder }}</strong></p>{% endif %}
+</section>
+<section class="panel"><div class="panel-header"><h2>Issue Records</h2><span>{{ history.issues|length }}</span></div><div class="table-wrap"><table><thead><tr><th>No</th><th>Consumer</th><th>Issue</th><th>Due</th><th>Status</th></tr></thead><tbody>{% for item in history.issues %}<tr><td>{{ item.issue_number }}</td><td>{{ item.student.name if item.student else item.employee.name }}</td><td>{{ item.issue_date }}</td><td>{{ item.due_date }}</td><td>{{ item.status }}</td></tr>{% else %}<tr><td colspan="5">No issue records.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="dashboard-grid">
+  <article class="panel"><h2>Returns</h2><ul class="plain-list">{% for item in history.receives %}<li>{{ item.receive_number }} - {{ item.receive_date }} - fine {{ item.calculated_fine_amount }}</li>{% else %}<li>No returns.</li>{% endfor %}</ul></article>
+  <article class="panel"><h2>Reservations</h2><ul class="plain-list">{% for item in history.reservations %}<li>{{ item.reservation_number }} - {{ item.status }}</li>{% else %}<li>No reservations.</li>{% endfor %}</ul></article>
+  <article class="panel"><h2>Fines</h2><ul class="plain-list">{% for item in history.fines %}<li>{{ item.fine_number }} - {{ item.fine_type }} - {{ item.payment_status }}</li>{% else %}<li>No fines.</li>{% endfor %}</ul></article>
+  <article class="panel"><h2>Lost / Damaged</h2><ul class="plain-list">{% for item in history.lost %}<li>Lost {{ item.lost_date }} - {{ item.resolved_status }}</li>{% endfor %}{% for item in history.damaged %}<li>Damaged {{ item.damage_date }} - {{ item.damage_level }}</li>{% endfor %}{% if not history.lost and not history.damaged %}<li>No lost or damaged cases.</li>{% endif %}</ul></article>
+</section>
+{% endif %}
+{% endblock %}
+
