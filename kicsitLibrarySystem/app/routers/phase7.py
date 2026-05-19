@@ -61,27 +61,13 @@ async def import_preview_action(request: Request, import_type: str = Form(...), 
     try:
         rows = parse_csv_upload(await file.read())
         batch = import_preview(db, import_type, file.filename or "upload.csv", rows, current_user)
+        if batch.failed_rows == 0:
+            commit_import(db, batch, rows)
         write_activity_log(db, request=request, action="IMPORT_PREVIEW", module="Import", user=current_user, entity_name="ImportBatch", entity_id=str(batch.id), description=f"Previewed {import_type} import.")
         return RedirectResponse(url="/imports", status_code=status.HTTP_302_FOUND)
     except Exception as exc:
         batches = db.scalars(select(ImportBatch).options(selectinload(ImportBatch.errors)).order_by(ImportBatch.created_at.desc()).limit(20)).all()
         return render(request, "phase7/imports.html", {"current_user": current_user, "batches": batches, "error": str(exc)}, "imports", status.HTTP_400_BAD_REQUEST)
-
-
-@router.post("/imports/{batch_id}/commit")
-def import_commit_action(request: Request, batch_id: int, current_user: User = Depends(require_permission("catalog.manage")), db: Session = Depends(get_db)):
-    batch = db.scalar(select(ImportBatch).options(selectinload(ImportBatch.errors)).where(ImportBatch.id == batch_id))
-    if batch is None:
-        return RedirectResponse(url="/imports", status_code=status.HTTP_302_FOUND)
-    rows = [__import__("json").loads(error.row_data_json) for error in []]
-    # Re-upload commit is intentionally blocked when preview rows are not persisted as successes.
-    if batch.failed_rows:
-        return RedirectResponse(url="/imports", status_code=status.HTTP_302_FOUND)
-    batch.status = "Ready - reupload required for commit"
-    db.add(batch)
-    db.commit()
-    write_activity_log(db, request=request, action="IMPORT_COMMIT_ATTEMPT", module="Import", user=current_user, entity_name="ImportBatch", entity_id=str(batch.id), description="Commit requested for preview batch.")
-    return RedirectResponse(url="/imports", status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/imports/{batch_id}/errors.csv")
@@ -96,4 +82,3 @@ def import_errors(batch_id: int, current_user: User = Depends(require_permission
 def smart_search_page(request: Request, q: str | None = None, current_user: User = Depends(require_permission("dashboard.view")), db: Session = Depends(get_db)):
     results = global_search(db, q or "")
     return render(request, "phase7/search.html", {"current_user": current_user, "q": q or "", "results": results}, "search")
-

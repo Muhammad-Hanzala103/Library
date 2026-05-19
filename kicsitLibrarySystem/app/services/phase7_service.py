@@ -15,6 +15,7 @@ from app.models import (
     BookCopy,
     BookMaster,
     Category,
+    Category,
     DamagedBook,
     Employee,
     Fine,
@@ -228,4 +229,3 @@ def global_search(db: Session, q: str) -> dict[str, list]:
         "employees": db.scalars(select(Employee).where(or_(Employee.p_number.ilike(like), Employee.cnic.ilike(like), Employee.name.ilike(like), Employee.phone.ilike(like))).limit(20)).all(),
         "categories": db.scalars(select(Category).where(Category.name.ilike(like)).limit(20)).all(),
     }
-

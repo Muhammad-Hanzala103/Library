@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Imports - {{ app_name }}{% endblock %}
+{% block page_title %}Import Data{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Import CSV</h2><span>Clean previews import immediately</span></div>
+  <form method="post" action="/imports/preview" enctype="multipart/form-data" class="data-form">
+    <div class="form-grid">
+      <label>Import type<select name="import_type"><option value="students">Students</option><option value="employees">Employees</option><option value="books">Books</option></select></label>
+      <label class="wide">CSV file<input type="file" name="file" accept=".csv,text/csv" required></label>
+    </div>
+    <div class="form-actions"><button type="submit">Preview and Import</button></div>
+  </form>
+</section>
+<section class="panel">
+  <div class="panel-header"><h2>Import Batches</h2><span>{{ batches|length }} recent</span></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Type</th><th>File</th><th>Total</th><th>Success</th><th>Failed</th><th>Status</th><th>Errors</th></tr></thead><tbody>
+  {% for batch in batches %}<tr><td>{{ batch.id }}</td><td>{{ batch.import_type }}</td><td>{{ batch.source_filename }}</td><td>{{ batch.total_rows }}</td><td>{{ batch.success_rows }}</td><td>{{ batch.failed_rows }}</td><td>{{ batch.status }}</td><td>{% if batch.failed_rows %}<a class="text-link" href="/imports/{{ batch.id }}/errors.csv">Download</a>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="8">No import batches.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<section class="panel">
+  <h2>Required CSV Columns</h2>
+  <ul class="plain-list">
+    <li>Students: registration_number, name, admission_number, department, phone, status, clearance_status</li>
+    <li>Employees: name, employee_type, p_number, cnic, department, designation, phone</li>
+    <li>Books: title, isbn, issn, source, book_location</li>
+  </ul>
+</section>
+{% endblock %}
+

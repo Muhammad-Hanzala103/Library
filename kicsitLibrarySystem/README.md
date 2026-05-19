@@ -275,3 +275,35 @@ Phase 6 adds:
 - In-library check by selected date
 - Status consistency checker
 - Authorized status correction with reason
+
+## Phase 7 Reports, Import, Export, and Search Commands
+
+After Phase 6 is running:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 7 adds:
+
+- Report engine
+- PDF export
+- Excel export
+- CSV export
+- Report filters
+- Catalog reports
+- Issue receive reports
+- Overdue reports
+- Fine reports
+- Clearance reports
+- Reservation reports
+- Lost and damaged reports
+- CSV import system
+- Import preview and failed-row tracking
+- Failed import error CSV download
+- Global smart search
