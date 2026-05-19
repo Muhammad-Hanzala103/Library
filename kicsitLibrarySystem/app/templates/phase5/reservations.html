@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Reservations - {{ app_name }}{% endblock %}
+{% block page_title %}Reservations{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Create Reservation</h2><span>Queue based</span></div>
+  <form method="post" class="data-form">
+    <div class="form-grid">
+      <label>Consumer type<select name="consumer_type"><option>Student</option><option>Employee</option></select></label>
+      <label>Consumer search<input name="consumer_query" placeholder="Registration, P Number, CNIC, name" required></label>
+      <label>Book<select name="book_master_id" required>{% for book in books %}<option value="{{ book.id }}">{{ book.title }}</option>{% endfor %}</select></label>
+      <label>Reservation date<input type="date" name="reservation_date" value="{{ today }}" required></label>
+      <label>Expiry date<input type="date" name="expiry_date" value="{{ default_expiry }}" required></label>
+      <label class="wide">Remarks<textarea name="remarks" rows="2"></textarea></label>
+    </div>
+    <div class="form-actions"><button type="submit">Create Reservation</button></div>
+  </form>
+</section>
+
+<section class="toolbar">
+  <form method="get" class="search-form">
+    <select name="status_filter">
+      <option value="">All statuses</option>
+      {% for status_name in ["Waiting","Ready for pickup","Completed","Cancelled","Expired"] %}
+      <option value="{{ status_name }}" {% if status_filter == status_name %}selected{% endif %}>{{ status_name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-header"><h2>Reservation Queue</h2><span>{{ reservations|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>No</th><th>Book</th><th>Consumer</th><th>Queue</th><th>Status</th><th>Expiry</th><th>Actions</th></tr></thead><tbody>
+  {% for item in reservations %}
+  <tr>
+    <td>{{ item.reservation_number }}</td><td>{{ item.book_master.title }}</td><td>{{ item.student.name if item.student else item.employee.name }}</td>
+    <td>{{ item.queue_position }}</td><td>{{ item.status }}</td><td>{{ item.expiry_date }}</td>
+    <td class="row-actions">
+      <form method="post" action="/reservations/{{ item.id }}/ready" class="inline-form"><button class="small-button" type="submit">Ready</button></form>
+      <form method="post" action="/reservations/{{ item.id }}/complete" class="inline-form"><button class="small-button" type="submit">Complete</button></form>
+      <form method="post" action="/reservations/{{ item.id }}/cancel" class="inline-delete-form"><input name="reason" placeholder="Reason" required><button class="danger-button small" type="submit">Cancel</button></form>
+    </td>
+  </tr>
+  {% else %}<tr><td colspan="7">No reservations found.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
+

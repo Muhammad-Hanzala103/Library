@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Unpaid Fines - {{ app_name }}{% endblock %}
+{% block page_title %}Unpaid Fines{% endblock %}
+{% block content %}
+<section class="panel"><div class="panel-header"><h2>Manage Unpaid Fines</h2><span>{{ fines|length }} record(s)</span></div>
+<div class="table-wrap"><table><thead><tr><th>No</th><th>Consumer</th><th>Book Copy</th><th>Type</th><th>Amount</th><th>Remaining</th><th>Status</th><th>Action</th></tr></thead><tbody>
+{% for fine in fines %}
+<tr><td>{{ fine.fine_number }}</td><td>{{ fine.student.name if fine.student else fine.employee.name }}</td><td>{{ fine.book_copy.accession_number if fine.book_copy else "" }}</td><td>{{ fine.fine_type }}</td><td>{{ fine.fine_amount }}</td><td>{{ fine.remaining_amount }}</td><td>{{ fine.payment_status }}</td><td><form method="post" action="/fines/{{ fine.id }}/paid"><button class="small-button" type="submit">Mark Paid</button></form></td></tr>
+{% else %}<tr><td colspan="8">No unpaid fines.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
+

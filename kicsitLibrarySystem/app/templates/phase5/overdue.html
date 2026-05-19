@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Overdue - {{ app_name }}{% endblock %}
+{% block page_title %}Overdue Dashboard{% endblock %}
+{% block content %}
+<section class="toolbar">
+  <form method="get" class="search-form"><input name="q" value="{{ q }}" placeholder="Search accession, title, consumer"><button type="submit">Search</button></form>
+  <div class="toolbar-actions"><a class="button secondary" href="/overdue/export/pdf?q={{ q }}">Export PDF</a><a class="button secondary" href="/overdue/export/excel?q={{ q }}">Export Excel</a></div>
+</section>
+<section class="panel">
+  <div class="panel-header"><h2>Overdue Holdings</h2><span>{{ records|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Consumer</th><th>Book</th><th>Accession</th><th>Issue</th><th>Due</th><th>Days</th><th>Fine</th><th>Reminder</th></tr></thead><tbody>
+  {% for item in records %}
+  {% set days = (as_of - item.due_date).days %}
+  <tr><td>{{ item.student.name if item.student else item.employee.name }}</td><td>{{ item.book_master.title }}</td><td>{{ item.book_copy.accession_number }}</td><td>{{ item.issue_date }}</td><td>{{ item.due_date }}</td><td>{{ days }}</td><td>{{ fine_func(item, as_of) }}</td><td>
+    <form method="post" action="/overdue/{{ item.id }}/reminder" class="toolbar-actions"><button class="small-button" name="channel" value="Email" type="submit">Email</button><button class="small-button" name="channel" value="WhatsApp" type="submit">WhatsApp</button></form>
+  </td></tr>
+  {% else %}<tr><td colspan="8">No overdue records found.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
+

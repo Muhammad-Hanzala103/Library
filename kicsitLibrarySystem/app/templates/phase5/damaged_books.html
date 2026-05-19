@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Damaged Books - {{ app_name }}{% endblock %}
+{% block page_title %}Damaged Books{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert">{{ error }}</div>{% endif %}
+<section class="panel"><div class="panel-header"><h2>Mark Damaged Book</h2><span>Active issue required</span></div>
+<form method="post" class="data-form"><div class="form-grid"><label>Accession<input name="accession_number" required></label><label>Damage date<input type="date" name="damage_date" value="{{ today }}" required></label><label>Damage level<select name="damage_level"><option>Minor</option><option>Major</option><option>Repairable</option><option>Discarded</option></select></label><label>Repair cost<input type="number" step="0.01" name="repair_cost" value="0"></label><label class="wide">Remarks<textarea name="remarks"></textarea></label></div><div class="form-actions"><button type="submit">Mark Damaged</button></div></form></section>
+<section class="panel"><div class="panel-header"><h2>Damaged Book Cases</h2><span>{{ records|length }} record(s)</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Accession</th><th>Consumer</th><th>Level</th><th>Repair Cost</th><th>Status</th></tr></thead><tbody>{% for item in records %}<tr><td>{{ item.damage_date }}</td><td>{{ item.book_copy.accession_number }}</td><td>{{ item.student.name if item.student else item.employee.name }}</td><td>{{ item.damage_level }}</td><td>{{ item.repair_cost }}</td><td>{{ item.resolved_status }}</td></tr>{% else %}<tr><td colspan="6">No damaged book cases.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}
+
