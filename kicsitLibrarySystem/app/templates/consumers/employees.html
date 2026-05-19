@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Employees - {{ app_name }}{% endblock %}
+{% block page_title %}Employees{% endblock %}
+
+{% block content %}
+<section class="toolbar">
+  <form method="get" action="/consumers/employees" class="search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search P Number, CNIC, name, phone">
+    <select name="employee_type">
+      <option value="">All employee types</option>
+      {% for item in employee_types %}
+      <option value="{{ item }}" {% if employee_type == item %}selected{% endif %}>{{ item }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/consumers/students">Students</a>
+    <a class="button" href="/consumers/employees/new">Add Employee</a>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Faculty and Staff Register</h2>
+    <span>{{ employees | length }} record(s)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Type</th><th>P Number</th><th>CNIC</th><th>Department</th><th>Phone</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for employee in employees %}
+        <tr>
+          <td>{{ employee.name }}</td>
+          <td>{{ employee.employee_type }}</td>
+          <td>{{ employee.p_number or "" }}</td>
+          <td>{{ employee.cnic or "" }}</td>
+          <td>{{ employee.department or "" }}</td>
+          <td>{{ employee.phone or "" }}</td>
+          <td class="row-actions"><a href="/consumers/employees/{{ employee.id }}">View</a><a href="/consumers/employees/{{ employee.id }}/edit">Edit</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No employees found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Profile - {{ app_name }}{% endblock %}
+{% block page_title %}Employee Profile{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2>{{ employee.name }}</h2>
+    <div class="toolbar-actions">
+      <a class="button secondary" href="/consumers/employees">Employees</a>
+      <a class="button" href="/consumers/employees/{{ employee.id }}/edit">Edit</a>
+    </div>
+  </div>
+  <div class="detail-list two-col">
+    <div><span>Employee type</span><strong>{{ employee.employee_type }}</strong></div>
+    <div><span>P Number</span><strong>{{ employee.p_number or "" }}</strong></div>
+    <div><span>CNIC</span><strong>{{ employee.cnic or "" }}</strong></div>
+    <div><span>Department</span><strong>{{ employee.department or "" }}</strong></div>
+    <div><span>Designation</span><strong>{{ employee.designation or "" }}</strong></div>
+    <div><span>Phone</span><strong>{{ employee.phone or "" }}</strong></div>
+    <div><span>Email</span><strong>{{ employee.email or "" }}</strong></div>
+    <div><span>Joining date</span><strong>{{ employee.joining_date or "" }}</strong></div>
+    <div><span>Leaving date</span><strong>{{ employee.leaving_date or "" }}</strong></div>
+    <div><span>Active</span><strong>{{ "Yes" if employee.is_active else "No" }}</strong></div>
+    <div><span>Remarks</span><strong>{{ employee.remarks or "" }}</strong></div>
+  </div>
+</section>
+{% endblock %}
+

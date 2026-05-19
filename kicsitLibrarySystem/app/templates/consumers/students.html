@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Students - {{ app_name }}{% endblock %}
+{% block page_title %}Students{% endblock %}
+
+{% block content %}
+<section class="toolbar">
+  <form method="get" action="/consumers/students" class="search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search registration, admission, name, phone">
+    <select name="status_filter">
+      <option value="">All statuses</option>
+      {% for item in student_statuses %}
+      <option value="{{ item }}" {% if status_filter == item %}selected{% endif %}>{{ item }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/consumers/employees">Employees</a>
+    <a class="button" href="/consumers/students/new">Add Student</a>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Student Register</h2>
+    <span>{{ students | length }} record(s)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Registration</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Clearance</th>
+          <th>Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td><strong>{{ student.registration_number }}</strong><small>{{ student.admission_number or "" }}</small></td>
+          <td>{{ student.name }}</td>
+          <td>{{ student.department or "" }}</td>
+          <td>{{ student.status }}</td>
+          <td>{{ student.clearance_status }}</td>
+          <td>{{ student.phone or "" }}</td>
+          <td class="row-actions">
+            <a href="/consumers/students/{{ student.id }}">View</a>
+            <a href="/consumers/students/{{ student.id }}/edit">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No students found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -9,6 +9,7 @@ from app.models.catalog import (
     LiteratureCategory,
     Publisher,
 )
+from app.models.consumers import Employee, Student
 
 __all__ = [
     "ActivityLog",
@@ -18,11 +19,13 @@ __all__ = [
     "BookMaster",
     "Category",
     "DepartmentCategory",
+    "Employee",
     "LiteratureCategory",
     "Permission",
     "Publisher",
     "Role",
     "RolePermission",
+    "Student",
     "User",
     "UserRole",
 ]

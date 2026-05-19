@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Student Profile - {{ app_name }}{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2>{{ student.name }}</h2>
+    <div class="toolbar-actions">
+      <a class="button secondary" href="/consumers/students">Students</a>
+      <a class="button" href="/consumers/students/{{ student.id }}/edit">Edit</a>
+    </div>
+  </div>
+  <div class="detail-list two-col">
+    <div><span>Registration number</span><strong>{{ student.registration_number }}</strong></div>
+    <div><span>Admission number</span><strong>{{ student.admission_number or "" }}</strong></div>
+    <div><span>Roll number</span><strong>{{ student.roll_number or "" }}</strong></div>
+    <div><span>Father name</span><strong>{{ student.father_name or "" }}</strong></div>
+    <div><span>Department</span><strong>{{ student.department or "" }}</strong></div>
+    <div><span>Program</span><strong>{{ student.program or "" }}</strong></div>
+    <div><span>Semester</span><strong>{{ student.semester or "" }}</strong></div>
+    <div><span>Session / Batch</span><strong>{{ student.session or "" }} {{ student.batch or "" }}</strong></div>
+    <div><span>Phone</span><strong>{{ student.phone or "" }}</strong></div>
+    <div><span>Email</span><strong>{{ student.email or "" }}</strong></div>
+    <div><span>Status</span><strong>{{ student.status }}</strong></div>
+    <div><span>Clearance</span><strong>{{ student.clearance_status }}</strong></div>
+    <div><span>Clearance date</span><strong>{{ student.clearance_date or "" }}</strong></div>
+    <div><span>Page / Register</span><strong>{{ student.page_number or "" }} / {{ student.register_number or "" }}</strong></div>
+    <div><span>Active</span><strong>{{ "Yes" if student.is_active else "No" }}</strong></div>
+    <div><span>Clearance remarks</span><strong>{{ student.clearance_remarks or "" }}</strong></div>
+  </div>
+</section>
+{% endblock %}
+

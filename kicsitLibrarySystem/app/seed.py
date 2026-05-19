@@ -14,13 +14,14 @@ PERMISSIONS = [
     ("reports.view", "View Reports", "Reports", "View selected reports."),
     ("logs.view", "View Activity Logs", "Administration", "View activity logs."),
     ("catalog.manage", "Manage Catalog", "Library Catalog", "Manage book masters and copies."),
+    ("consumers.manage", "Manage Consumers", "Consumers", "Manage students, faculty, and staff."),
     ("circulation.manage", "Manage Issue Return", "Circulation", "Issue and return books."),
 ]
 
 ROLE_PERMISSION_CODES = {
     "Super Admin": [code for code, *_ in PERMISSIONS],
     "Admin": ["dashboard.view", "users.manage", "settings.manage", "reports.view", "logs.view"],
-    "Librarian": ["dashboard.view", "catalog.manage", "circulation.manage", "reports.view", "logs.view"],
+    "Librarian": ["dashboard.view", "catalog.manage", "consumers.manage", "circulation.manage", "reports.view", "logs.view"],
     "Assistant Librarian": ["dashboard.view", "circulation.manage", "reports.view"],
 }
 

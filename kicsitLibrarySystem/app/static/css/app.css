@@ -212,6 +212,10 @@ a {
   gap: 12px;
 }
 
+.detail-list.two-col {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
 .detail-list div {
   display: grid;
   gap: 4px;
@@ -286,6 +290,14 @@ td small {
 .search-form input {
   min-width: 260px;
   flex: 1;
+}
+
+.search-form select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 11px;
+  background: #ffffff;
+  font: inherit;
 }
 
 .button,
@@ -382,6 +394,16 @@ button,
 
 .wide {
   grid-column: 1 / -1;
+}
+
+.inline-check {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+}
+
+.inline-check input {
+  width: auto;
 }
 
 .form-actions {
@@ -536,6 +558,7 @@ button,
 
   .metric-grid,
   .dashboard-grid,
+  .detail-list.two-col,
   .form-grid,
   .data-form.compact .form-grid,
   .book-detail-grid,

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit Employee" if mode == "edit" else "Add Employee" }} - {{ app_name }}{% endblock %}
+{% block page_title %}{{ "Edit Employee" if mode == "edit" else "Add Employee" }}{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h2>{{ "Update employee record" if mode == "edit" else "Create employee record" }}</h2>
+    <a class="text-link" href="/consumers/employees">Back to employees</a>
+  </div>
+  {% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" class="data-form">
+    <div class="form-grid">
+      <label>Name<input name="name" value="{{ employee.name if employee else '' }}" required></label>
+      <label>
+        Employee type
+        <select name="employee_type" required>
+          {% for item in employee_types %}
+          <option value="{{ item }}" {% if employee and employee.employee_type == item %}selected{% endif %}>{{ item }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>P Number<input name="p_number" value="{{ employee.p_number if employee and employee.p_number else '' }}"></label>
+      <label>CNIC<input name="cnic" value="{{ employee.cnic if employee and employee.cnic else '' }}"></label>
+      <label>Department<input name="department" value="{{ employee.department if employee and employee.department else '' }}"></label>
+      <label>Designation<input name="designation" value="{{ employee.designation if employee and employee.designation else '' }}"></label>
+      <label>Phone<input name="phone" value="{{ employee.phone if employee and employee.phone else '' }}"></label>
+      <label>Email<input name="email" type="email" value="{{ employee.email if employee and employee.email else '' }}"></label>
+      <label>Joining date<input name="joining_date" type="date" value="{{ employee.joining_date if employee and employee.joining_date else '' }}"></label>
+      <label>Leaving date<input name="leaving_date" type="date" value="{{ employee.leaving_date if employee and employee.leaving_date else '' }}"></label>
+      <label class="wide">Remarks<textarea name="remarks" rows="4">{{ employee.remarks if employee and employee.remarks else '' }}</textarea></label>
+      <label class="inline-check"><input name="is_active" type="checkbox" {% if not employee or employee.is_active %}checked{% endif %}> Active employee</label>
+    </div>
+    <div class="form-actions">
+      <a class="button secondary" href="/consumers/employees">Cancel</a>
+      <button type="submit">{{ "Save Changes" if mode == "edit" else "Create Employee" }}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+

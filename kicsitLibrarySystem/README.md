@@ -168,3 +168,29 @@ Phase 2 adds:
 - Basic catalog search
 - CSV import template download
 - Activity logs for add, edit, and delete actions
+
+## Phase 3 Consumers Commands
+
+After Phase 2 is running, apply the consumers migration and refresh seed data:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 3 adds:
+
+- Student CRUD
+- Employee CRUD
+- Permanent Faculty
+- Visiting Faculty
+- Permanent Staff
+- Temporary Staff
+- Student status and clearance fields
+- Page number and register number
+- Search by registration number, admission number, P Number, CNIC, name, and phone
+- Student and employee profile pages
+- Activity logs for add and edit actions
