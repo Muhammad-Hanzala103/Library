@@ -307,3 +307,29 @@ Phase 7 adds:
 - Import preview and failed-row tracking
 - Failed import error CSV download
 - Global smart search
+
+## Phase 8 Audit, Inventory, Documents, and Arrivals Commands
+
+After Phase 7 is running:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 8 adds:
+
+- HEC, PEC, NCEAC, QEC, internal, and other visit records
+- Audit records with observations, suggestions, findings, recommendations, and action tracking
+- Attachment documents for audit and visit evidence
+- Furniture and equipment inventory
+- New arrivals, journals, magazines, newspapers, reports, project reports, and thesis records
+- SOP and National Library Rates upload with versioning
+- Secure document validation and local document storage
+- Document search and download
+- PDF, Excel, and CSV reports for visits, audits, inventory, arrivals, and documents
+- Activity logs for visit, audit, inventory, arrival, document upload, and report export actions

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Phase 8 Reports - {{ app_name }}{% endblock %}
+{% block page_title %}Audit, Inventory and Document Reports{% endblock %}
+{% block content %}
+<section class="toolbar">
+  <form method="get" class="search-form">
+    <select name="report_type">{% for key, label in report_types.items() %}<option value="{{ key }}" {% if report_type == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <button type="submit">Run Report</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/phase8-reports/export/pdf?report_type={{ report_type }}">PDF</a>
+    <a class="button secondary" href="/phase8-reports/export/excel?report_type={{ report_type }}">Excel</a>
+    <a class="button secondary" href="/phase8-reports/export/csv?report_type={{ report_type }}">CSV</a>
+  </div>
+</section>
+<section class="panel">
+  <div class="panel-header"><h2>{{ result.title }}</h2><span>{{ result.rows|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr>{% for h in result.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead><tbody>
+    {% for row in result.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% else %}<tr><td colspan="{{ result.headers|length }}">No report records.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

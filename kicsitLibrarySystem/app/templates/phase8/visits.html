@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Visit Records - {{ app_name }}{% endblock %}
+{% block page_title %}Audit and Accreditation Visits{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Add Visit Record</h2><span>HEC, PEC, NCEAC, QEC</span></div>
+  <form method="post" action="/visits" class="data-form">
+    <div class="form-grid">
+      <label>Visit Date<input type="date" name="visit_date" required></label>
+      <label>Organization<select name="organization" required>{% for item in organizations %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select></label>
+      <label>Visit Type<input name="visit_type" required placeholder="Accreditation, Review"></label>
+      <label>Department<input name="department" placeholder="CS, CE, Library"></label>
+      <label>Follow Up Date<input type="date" name="follow_up_date"></label>
+      <label>Status<input name="status_value" value="Open"></label>
+      <label class="wide">Attachment<select name="attachment_document_id"><option value="">No attachment</option>{% for doc in documents %}<option value="{{ doc.id }}">{{ doc.title }} v{{ doc.version }}</option>{% endfor %}</select></label>
+      <label class="wide">Team Members<textarea name="team_members" rows="2"></textarea></label>
+      <label class="wide">Purpose<textarea name="purpose" rows="2"></textarea></label>
+      <label class="wide">Observations<textarea name="observations" rows="2"></textarea></label>
+      <label class="wide">Suggestions<textarea name="suggestions" rows="2"></textarea></label>
+      <label class="wide">Findings<textarea name="findings" rows="2"></textarea></label>
+      <label class="wide">Action Taken<textarea name="action_taken" rows="2"></textarea></label>
+    </div>
+    <button type="submit">Save Visit</button>
+  </form>
+</section>
+<section class="toolbar"><form method="get" class="search-form"><input name="q" value="{{ q }}" placeholder="Search organization, type, department, status"><button type="submit">Search</button></form></section>
+<section class="panel">
+  <div class="panel-header"><h2>Visit Register</h2><span>{{ records|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Organization</th><th>Type</th><th>Department</th><th>Status</th><th>Follow Up</th><th>Attachment</th></tr></thead><tbody>
+    {% for item in records %}<tr><td>{{ item.visit_date }}</td><td>{{ item.organization }}</td><td>{{ item.visit_type }}</td><td>{{ item.department or "-" }}</td><td>{{ item.status }}</td><td>{{ item.follow_up_date or "-" }}</td><td>{% if item.attachment %}<a href="/documents/{{ item.attachment.id }}/download">{{ item.attachment.title }}</a>{% else %}-{% endif %}</td></tr>{% else %}<tr><td colspan="7">No visit records.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

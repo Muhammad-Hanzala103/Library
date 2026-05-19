@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Documents - {{ app_name }}{% endblock %}
+{% block page_title %}SOPs and Documents{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Upload Controlled Document</h2><span>SOP, rates, evidence, invoice</span></div>
+  <form method="post" action="/documents" enctype="multipart/form-data" class="data-form">
+    <div class="form-grid">
+      <label>Title<input name="title" required></label>
+      <label>Type<select name="document_type" required>{% for item in document_types %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select></label>
+      <label>Version<input name="version" value="1.0" required></label>
+      <label>Category<input name="category" placeholder="SOP, Rates, Evidence"></label>
+      <label class="wide">File<input type="file" name="file" accept=".pdf,.docx,.xlsx,.csv,.jpg,.jpeg,.png" required></label>
+      <label class="wide">Description<textarea name="description" rows="2"></textarea></label>
+      <label class="wide">Remarks<textarea name="remarks" rows="2"></textarea></label>
+    </div>
+    <button type="submit">Upload Document</button>
+  </form>
+</section>
+
+<section class="toolbar">
+  <form method="get" class="search-form">
+    <input name="q" value="{{ q }}" placeholder="Search title, category, file">
+    <select name="document_type"><option value="">All types</option>{% for item in document_types %}<option value="{{ item }}" {% if document_type == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+    <button type="submit">Search</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-header"><h2>Document Register</h2><span>{{ records|length }} record(s)</span></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Title</th><th>Type</th><th>Version</th><th>Category</th><th>Uploaded</th><th>File</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for item in records %}
+      <tr>
+        <td>{{ item.title }}</td><td>{{ item.document_type }}</td><td>{{ item.version }}</td><td>{{ item.category or "-" }}</td>
+        <td>{{ item.upload_date.date() }}</td><td>{{ item.original_filename }}</td>
+        <td><a class="button secondary" href="/documents/{{ item.id }}/download">Download</a></td>
+      </tr>
+    {% else %}<tr><td colspan="7">No documents found.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endblock %}

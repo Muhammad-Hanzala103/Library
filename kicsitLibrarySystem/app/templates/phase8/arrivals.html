@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}New Arrivals - {{ app_name }}{% endblock %}
+{% block page_title %}New Arrivals, Journals and Magazines{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Add Arrival</h2><span>Books, journals, magazines</span></div>
+  <form method="post" action="/arrivals" class="data-form">
+    <div class="form-grid">
+      <label>Arrival Number<input name="arrival_number" required></label>
+      <label>Material Type<select name="material_type" required>{% for item in material_types %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select></label>
+      <label class="wide">Title<input name="title" required></label>
+      <label>Category<select name="category_id"><option value="">None</option>{% for item in categories %}<option value="{{ item.id }}">{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Department<select name="department_category_id"><option value="">None</option>{% for item in departments %}<option value="{{ item.id }}">{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Quantity<input type="number" min="1" name="quantity" value="1" required></label>
+      <label>Purchase Year<input type="number" name="purchase_year" min="1900" max="2100"></label>
+      <label>Purchase Month<input name="purchase_month"></label>
+      <label>Supplier<input name="supplier"></label>
+      <label>Invoice Number<input name="invoice_number"></label>
+      <label>Invoice File<select name="invoice_document_id"><option value="">No invoice</option>{% for doc in documents %}<option value="{{ doc.id }}">{{ doc.title }} v{{ doc.version }}</option>{% endfor %}</select></label>
+      <label>Received Date<input type="date" name="received_date"></label>
+      <label class="wide">Remarks<textarea name="remarks" rows="2"></textarea></label>
+    </div>
+    <button type="submit">Save Arrival</button>
+  </form>
+</section>
+<section class="toolbar"><form method="get" class="search-form"><input name="q" value="{{ q }}" placeholder="Search arrival no, title, type, invoice"><button type="submit">Search</button></form></section>
+<section class="panel">
+  <div class="panel-header"><h2>Arrival Register</h2><span>{{ records|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>No</th><th>Type</th><th>Title</th><th>Category</th><th>Department</th><th>Qty</th><th>Received</th><th>Invoice</th></tr></thead><tbody>
+    {% for item in records %}<tr><td>{{ item.arrival_number }}</td><td>{{ item.material_type }}</td><td>{{ item.title }}</td><td>{{ item.category.name if item.category else "-" }}</td><td>{{ item.department_category.name if item.department_category else "-" }}</td><td>{{ item.quantity }}</td><td>{{ item.received_date or "-" }}</td><td>{% if item.invoice_document %}<a href="/documents/{{ item.invoice_document.id }}/download">{{ item.invoice_number or item.invoice_document.title }}</a>{% else %}{{ item.invoice_number or "-" }}{% endif %}</td></tr>{% else %}<tr><td colspan="8">No arrivals found.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

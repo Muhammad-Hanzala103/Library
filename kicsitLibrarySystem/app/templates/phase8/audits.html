@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Audit Records - {{ app_name }}{% endblock %}
+{% block page_title %}Audit Records{% endblock %}
+{% block content %}
+{% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+<section class="panel">
+  <div class="panel-header"><h2>Add Audit Record</h2><span>Observations, findings, actions</span></div>
+  <form method="post" action="/audits" class="data-form">
+    <div class="form-grid">
+      <label>Audit Date<input type="date" name="audit_date" required></label>
+      <label>Audit Type<input name="audit_type" required placeholder="Internal, Financial, Stock"></label>
+      <label>Financial Year<input name="financial_year" placeholder="2025-26"></label>
+      <label>Responsible Person<input name="responsible_person"></label>
+      <label>Status<input name="status_value" value="Open"></label>
+      <label class="wide">Attachment<select name="attachment_document_id"><option value="">No attachment</option>{% for doc in documents %}<option value="{{ doc.id }}">{{ doc.title }} v{{ doc.version }}</option>{% endfor %}</select></label>
+      <label class="wide">Observations<textarea name="observations" rows="2"></textarea></label>
+      <label class="wide">Suggestions<textarea name="suggestions" rows="2"></textarea></label>
+      <label class="wide">Findings<textarea name="findings" rows="2"></textarea></label>
+      <label class="wide">Recommendations<textarea name="recommendations" rows="2"></textarea></label>
+      <label class="wide">Action Required<textarea name="action_required" rows="2"></textarea></label>
+      <label class="wide">Action Taken<textarea name="action_taken" rows="2"></textarea></label>
+    </div>
+    <button type="submit">Save Audit</button>
+  </form>
+</section>
+<section class="toolbar"><form method="get" class="search-form"><input name="q" value="{{ q }}" placeholder="Search type, year, responsible, status"><button type="submit">Search</button></form></section>
+<section class="panel">
+  <div class="panel-header"><h2>Audit Register</h2><span>{{ records|length }} record(s)</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Year</th><th>Responsible</th><th>Status</th><th>Attachment</th></tr></thead><tbody>
+    {% for item in records %}<tr><td>{{ item.audit_date }}</td><td>{{ item.audit_type }}</td><td>{{ item.financial_year or "-" }}</td><td>{{ item.responsible_person or "-" }}</td><td>{{ item.status }}</td><td>{% if item.attachment %}<a href="/documents/{{ item.attachment.id }}/download">{{ item.attachment.title }}</a>{% else %}-{% endif %}</td></tr>{% else %}<tr><td colspan="6">No audit records.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
