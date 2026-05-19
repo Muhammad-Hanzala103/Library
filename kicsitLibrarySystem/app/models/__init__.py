@@ -10,6 +10,7 @@ from app.models.catalog import (
     Publisher,
 )
 from app.models.consumers import Employee, Student
+from app.models.circulation import Fine, IssueRecord, ReceiveRecord
 
 __all__ = [
     "ActivityLog",
@@ -20,9 +21,12 @@ __all__ = [
     "Category",
     "DepartmentCategory",
     "Employee",
+    "Fine",
+    "IssueRecord",
     "LiteratureCategory",
     "Permission",
     "Publisher",
+    "ReceiveRecord",
     "Role",
     "RolePermission",
     "Student",

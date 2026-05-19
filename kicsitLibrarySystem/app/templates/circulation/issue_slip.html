@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Slip - {{ app_name }}{% endblock %}
+{% block page_title %}Issue Slip{% endblock %}
+
+{% block content %}
+<section class="panel slip">
+  <div class="panel-header">
+    <h2>KICSIT Library Issue Slip</h2>
+    <button onclick="window.print()" type="button">Print</button>
+  </div>
+  <div class="detail-list two-col">
+    <div><span>Issue Number</span><strong>{{ issue.issue_number }}</strong></div>
+    <div><span>Issue Date</span><strong>{{ issue.issue_date }}</strong></div>
+    <div><span>Due Date</span><strong>{{ issue.due_date }}</strong></div>
+    <div><span>Book Title</span><strong>{{ issue.book_master.title }}</strong></div>
+    <div><span>Accession Number</span><strong>{{ issue.book_copy.accession_number }}</strong></div>
+    <div><span>Consumer</span><strong>{{ issue.student.name if issue.student else issue.employee.name }}</strong></div>
+    <div><span>Consumer Type</span><strong>{{ issue.consumer_type }}</strong></div>
+    <div><span>Status</span><strong>{{ issue.status }}</strong></div>
+  </div>
+  <div class="signature-row">
+    <span>Librarian Signature</span>
+    <span>Consumer Signature</span>
+  </div>
+</section>
+{% endblock %}
+

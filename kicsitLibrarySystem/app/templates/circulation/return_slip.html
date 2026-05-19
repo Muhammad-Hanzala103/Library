@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Return Slip - {{ app_name }}{% endblock %}
+{% block page_title %}Return Slip{% endblock %}
+
+{% block content %}
+<section class="panel slip">
+  <div class="panel-header">
+    <h2>KICSIT Library Return Slip</h2>
+    <button onclick="window.print()" type="button">Print</button>
+  </div>
+  <div class="detail-list two-col">
+    <div><span>Receive Number</span><strong>{{ receive.receive_number }}</strong></div>
+    <div><span>Issue Number</span><strong>{{ issue.issue_number }}</strong></div>
+    <div><span>Receive Date</span><strong>{{ receive.receive_date }}</strong></div>
+    <div><span>Book Title</span><strong>{{ issue.book_master.title }}</strong></div>
+    <div><span>Accession Number</span><strong>{{ issue.book_copy.accession_number }}</strong></div>
+    <div><span>Consumer</span><strong>{{ issue.student.name if issue.student else issue.employee.name }}</strong></div>
+    <div><span>Book Condition</span><strong>{{ receive.book_condition }}</strong></div>
+    <div><span>Overdue Days</span><strong>{{ receive.overdue_days }}</strong></div>
+    <div><span>Fine Amount</span><strong>{{ receive.calculated_fine_amount }}</strong></div>
+    <div><span>Fine Status</span><strong>{{ fine.payment_status if fine else "Paid" }}</strong></div>
+  </div>
+  <div class="signature-row">
+    <span>Librarian Signature</span>
+    <span>Consumer Signature</span>
+  </div>
+</section>
+{% endblock %}
+

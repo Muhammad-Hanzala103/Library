@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
-from app.models import ActivityLog, BookCopy, BookMaster, Employee, Permission, Role, Student, User
+from app.models import ActivityLog, BookCopy, BookMaster, Employee, Fine, IssueRecord, Permission, Role, Student, User
 from app.permissions import require_permission
 from app.services.auth_service import get_user_permission_codes
 
@@ -31,6 +31,8 @@ def dashboard_home(
         "copies": db.scalar(select(func.count(BookCopy.id)).where(BookCopy.is_deleted == False)) or 0,  # noqa: E712
         "students": db.scalar(select(func.count(Student.id))) or 0,
         "employees": db.scalar(select(func.count(Employee.id))) or 0,
+        "active_issues": db.scalar(select(func.count(IssueRecord.id)).where(IssueRecord.status == "Active")) or 0,
+        "unpaid_fines": db.scalar(select(func.count(Fine.id)).where(Fine.payment_status.in_(["Unpaid", "Partial"]))) or 0,
     }
     recent_logs = db.scalars(select(ActivityLog).order_by(ActivityLog.created_at.desc()).limit(8)).all()
     permissions = get_user_permission_codes(current_user)

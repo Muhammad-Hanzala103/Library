@@ -194,3 +194,33 @@ Phase 3 adds:
 - Search by registration number, admission number, P Number, CNIC, name, and phone
 - Student and employee profile pages
 - Activity logs for add and edit actions
+
+## Phase 4 Circulation Commands
+
+After Phase 3 is running, apply the circulation migration:
+
+```powershell
+cd d:\Project\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 4 adds:
+
+- Issue records
+- Receive records
+- Fines
+- Issue Book screen
+- Return Book screen
+- Consumer and accession lookup before issue
+- Issue limit checks
+- Pending fine block
+- Student clearance block
+- Book status checks
+- Book copy status updates on issue and return
+- Overdue day and fine calculation
+- Issue receive history
+- Printable issue and return slips
+- Activity logs for issue and return

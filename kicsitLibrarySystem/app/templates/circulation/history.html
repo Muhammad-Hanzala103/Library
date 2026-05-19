@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Receive History - {{ app_name }}{% endblock %}
+{% block page_title %}Issue Receive History{% endblock %}
+
+{% block content %}
+<section class="toolbar">
+  <form method="get" action="/circulation/history" class="search-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search issue number, accession, title, consumer">
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/circulation/issue">Issue Book</a>
+    <a class="button secondary" href="/circulation/return">Return Book</a>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header"><h2>Circulation Records</h2><span>{{ records | length }} record(s)</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Issue No</th>
+          <th>Book</th>
+          <th>Accession</th>
+          <th>Consumer</th>
+          <th>Issue</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th>Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in records %}
+        <tr>
+          <td><a class="text-link" href="/circulation/issue/{{ item.id }}/slip">{{ item.issue_number }}</a></td>
+          <td>{{ item.book_master.title }}</td>
+          <td>{{ item.book_copy.accession_number }}</td>
+          <td>{{ item.student.name if item.student else item.employee.name }}</td>
+          <td>{{ item.issue_date }}</td>
+          <td>{{ item.due_date }}</td>
+          <td>{{ item.status }}</td>
+          <td>
+            {% if item.receive_record %}
+            <a class="text-link" href="/circulation/return/{{ item.receive_record.id }}/slip">{{ item.receive_record.receive_date }}</a>
+            {% else %}
+            Active
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">No circulation records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

@@ -7,6 +7,7 @@ from app.config import get_settings
 from app.routers import auth as auth_router
 from app.routers import catalog
 from app.routers import consumers
+from app.routers import circulation
 from app.routers import dashboard
 
 
@@ -21,6 +22,7 @@ def create_app() -> FastAPI:
     app.include_router(dashboard.router)
     app.include_router(catalog.router)
     app.include_router(consumers.router)
+    app.include_router(circulation.router)
 
     @app.get("/", include_in_schema=False)
     def home() -> RedirectResponse:

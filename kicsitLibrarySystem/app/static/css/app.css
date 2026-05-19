@@ -466,6 +466,46 @@ button,
   line-height: 1.8;
 }
 
+.slip {
+  max-width: 850px;
+}
+
+.signature-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 56px;
+}
+
+.signature-row span {
+  border-top: 1px solid var(--text);
+  padding-top: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media print {
+  .sidebar,
+  .topbar,
+  .toolbar-actions,
+  button {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  .content {
+    padding: 0;
+  }
+
+  .panel {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
 .login-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #e7f2f0 0%, #f5f7fa 52%, #eef2f6 100%);

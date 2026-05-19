@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Book - {{ app_name }}{% endblock %}
+{% block page_title %}Issue Book{% endblock %}
+
+{% block content %}
+<section class="toolbar">
+  <form method="get" action="/circulation/issue" class="search-form">
+    <select name="consumer_type">
+      <option value="Student" {% if consumer_type == "Student" %}selected{% endif %}>Student</option>
+      <option value="Employee" {% if consumer_type == "Employee" %}selected{% endif %}>Employee</option>
+    </select>
+    <input name="consumer_query" value="{{ consumer_query }}" placeholder="Registration, admission, P Number, CNIC, name">
+    <input name="accession_number" value="{{ accession_number }}" placeholder="Accession number">
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar-actions">
+    <a class="button secondary" href="/circulation/return">Return Book</a>
+    <a class="button secondary" href="/circulation/history">History</a>
+  </div>
+</section>
+
+{% if error %}<div class="form-alert" role="alert">{{ error }}</div>{% endif %}
+
+<section class="dashboard-grid">
+  <article class="panel">
+    <div class="panel-header"><h2>Consumer</h2><span>{{ consumer_type }}</span></div>
+    {% if consumer %}
+    <div class="detail-list">
+      <div><span>Name</span><strong>{{ consumer.name }}</strong></div>
+      <div><span>Identifier</span><strong>{{ consumer.registration_number if consumer_type == "Student" else (consumer.p_number or consumer.cnic) }}</strong></div>
+      <div><span>Status</span><strong>{{ consumer.status if consumer_type == "Student" else ("Active" if consumer.is_active else "Inactive") }}</strong></div>
+      {% if consumer_type == "Student" %}
+      <div><span>Clearance</span><strong>{{ consumer.clearance_status }}</strong></div>
+      {% endif %}
+      <div><span>Active Issues</span><strong>{{ consumer_active_issues | length }}</strong></div>
+      <div><span>Unpaid Fines</span><strong>{{ consumer_unpaid_fines | length }}</strong></div>
+    </div>
+    {% else %}
+    <p>Search a consumer to continue.</p>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-header"><h2>Book Copy</h2><span>Accession</span></div>
+    {% if copy %}
+    <div class="detail-list">
+      <div><span>Title</span><strong>{{ copy.book_master.title }}</strong></div>
+      <div><span>Accession</span><strong>{{ copy.accession_number }}</strong></div>
+      <div><span>Status</span><strong>{{ copy.status }}</strong></div>
+      <div><span>Location</span><strong>{{ copy.location or "" }} {{ copy.rack or "" }} {{ copy.shelf or "" }}</strong></div>
+    </div>
+    {% else %}
+    <p>Search accession number to continue.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-header"><h2>Issue Details</h2><span>Limit and fine checks run on submit</span></div>
+  <form method="post" action="/circulation/issue" class="data-form">
+    <div class="form-grid">
+      <label>
+        Consumer type
+        <select name="consumer_type">
+          <option value="Student" {% if consumer_type == "Student" %}selected{% endif %}>Student</option>
+          <option value="Employee" {% if consumer_type == "Employee" %}selected{% endif %}>Employee</option>
+        </select>
+      </label>
+      <label>Consumer search value<input name="consumer_query" value="{{ consumer_query }}" required></label>
+      <label>Accession number<input name="accession_number" value="{{ accession_number }}" required></label>
+      <label>Issue date<input name="issue_date" type="date" value="{{ issue_date }}" required></label>
+      <label>Due date<input name="due_date" type="date" value="{{ due_date }}" required></label>
+      <label class="wide">Remarks<textarea name="remarks" rows="3"></textarea></label>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Issue Book</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
