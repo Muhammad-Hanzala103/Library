@@ -333,3 +333,31 @@ Phase 8 adds:
 - Document search and download
 - PDF, Excel, and CSV reports for visits, audits, inventory, arrivals, and documents
 - Activity logs for visit, audit, inventory, arrival, document upload, and report export actions
+
+## Phase 9 Settings, Backup, Restore, and Documentation Commands
+
+After Phase 8 is running:
+
+```powershell
+cd c:\Projects\Library\kicsitLibrarySystem
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+Phase 9 adds:
+
+- **Global ERP Configuration Console**: Settings page managing live database properties (circulation duration, borrow capacity, fines rate, reservation hold times, SMTP hosts, WhatsApp configurations, mysqldump locations, report headers).
+- **Settings Service**: Dynamic parameter retrieval casting variables instantly (e.g. string to int, boolean, Decimal) without system restarts.
+- **Automated Database Backup**: Super Admin dashboard capability to create one-click SQL dumps using native Windows binaries (`mysqldump`).
+- **Disaster Recovery Restore**: Browser-based database restoration secured via strict permissions checking (`system.manage_all`) and two-factor text confirmation guardrails (`CONFIRM RESTORE`).
+- **Enhanced Analytics Dashboard**: Integration of **Chart.js** canvases tracking 5 dynamic datasets, 22 granular administrative metrics, and a dynamic real-time system alerts panel.
+- **Academic Thesis Documentation**:
+  - `docs/INSTALLATION_GUIDE.md`: Local network hosting instructions, Windows Firewall rule creation, and environment setups.
+  - `docs/FINAL_PROJECT_REPORT_OUTLINE.md`: 6-chapter graduation thesis blueprint for student **Muhammad Hanzala**.
+  - `docs/PRESENTATION_POINTS.md`: Sequential slide sequence, defense outlines, and bullet points.
+  - `docs/VIVA_PREPARATION.md`: Exhaustive 30-question prep manual covering web stacks, secure networking, and ORM mechanics.
+  - `docs/MANUAL_TEST_CHECKLIST.md`: Operational test scenarios for system boundary testing.
+
