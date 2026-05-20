@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
@@ -59,7 +61,16 @@ def imports_page(request: Request, current_user: User = Depends(require_permissi
 @router.post("/imports/preview")
 async def import_preview_action(request: Request, import_type: str = Form(...), file: UploadFile = File(...), current_user: User = Depends(require_permission("catalog.manage")), db: Session = Depends(get_db)):
     try:
-        rows = parse_csv_upload(await file.read())
+        settings = get_settings()
+        filename = file.filename or ""
+        if Path(filename).suffix.lower() != ".csv":
+            raise ValueError("Only CSV import files are supported by this importer.")
+        content = await file.read()
+        if not content:
+            raise ValueError("Import file is empty.")
+        if len(content) > settings.max_upload_size_bytes:
+            raise ValueError(f"Import file must be {settings.max_upload_size_mb} MB or less.")
+        rows = parse_csv_upload(content)
         batch = import_preview(db, import_type, file.filename or "upload.csv", rows, current_user)
         if batch.failed_rows == 0:
             commit_import(db, batch, rows)

@@ -202,10 +202,14 @@ def overdue_records(db: Session, as_of: date | None = None, query: str | None = 
     return db.scalars(statement).unique().all()
 
 
-def calculated_overdue_fine(issue: IssueRecord, as_of: date | None = None) -> Decimal:
+def calculated_overdue_fine(
+    issue: IssueRecord,
+    as_of: date | None = None,
+    fine_per_day: Decimal = Decimal("10.00"),
+) -> Decimal:
     as_of = as_of or date.today()
     days = max((as_of - issue.due_date).days, 0)
-    return Decimal(days) * Decimal("10.00")
+    return Decimal(days) * fine_per_day
 
 
 def unpaid_fines(db: Session) -> list[Fine]:
@@ -331,7 +335,11 @@ def list_damaged_books(db: Session) -> list[DamagedBook]:
     return db.scalars(select(DamagedBook).options(selectinload(DamagedBook.book_copy), selectinload(DamagedBook.student), selectinload(DamagedBook.employee)).order_by(DamagedBook.created_at.desc())).all()
 
 
-def overdue_pdf_bytes(records: list[IssueRecord], as_of: date) -> bytes:
+def overdue_pdf_bytes(
+    records: list[IssueRecord],
+    as_of: date,
+    fine_per_day: Decimal = Decimal("10.00"),
+) -> bytes:
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
@@ -344,7 +352,7 @@ def overdue_pdf_bytes(records: list[IssueRecord], as_of: date) -> bytes:
     y -= 25
     for item in records:
         days = max((as_of - item.due_date).days, 0)
-        line = f"{item.book_copy.accession_number} | {item.book_master.title[:35]} | {consumer_name(item)} | Due {item.due_date} | {days} days | Fine {calculated_overdue_fine(item, as_of)}"
+        line = f"{item.book_copy.accession_number} | {item.book_master.title[:35]} | {consumer_name(item)} | Due {item.due_date} | {days} days | Fine {calculated_overdue_fine(item, as_of, fine_per_day)}"
         pdf.drawString(40, y, line)
         y -= 16
         if y < 60:
@@ -356,7 +364,11 @@ def overdue_pdf_bytes(records: list[IssueRecord], as_of: date) -> bytes:
     return buffer.getvalue()
 
 
-def overdue_excel_bytes(records: list[IssueRecord], as_of: date) -> bytes:
+def overdue_excel_bytes(
+    records: list[IssueRecord],
+    as_of: date,
+    fine_per_day: Decimal = Decimal("10.00"),
+) -> bytes:
     workbook = Workbook()
     sheet = workbook.active
     sheet.title = "Overdue"
@@ -371,7 +383,7 @@ def overdue_excel_bytes(records: list[IssueRecord], as_of: date) -> bytes:
             item.issue_date.isoformat(),
             item.due_date.isoformat(),
             days,
-            float(calculated_overdue_fine(item, as_of)),
+            float(calculated_overdue_fine(item, as_of, fine_per_day)),
         ])
     buffer = io.BytesIO()
     workbook.save(buffer)

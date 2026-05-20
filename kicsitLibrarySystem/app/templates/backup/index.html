@@ -98,7 +98,8 @@
                   <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
                     <!-- Restore Form Trigger -->
                     {% if backup.status == 'Success' %}
-                      <form action="/backups/{{ backup.id }}/restore" method="post" onsubmit="return confirmRestore('{{ backup.filename }}');" style="margin: 0;">
+                      <form action="/backups/{{ backup.id }}/restore" method="post" onsubmit="return confirmRestore(this, '{{ backup.filename }}');" style="margin: 0;">
+                        <input type="hidden" name="confirm_text" value="">
                         <button type="submit" class="btn" style="background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
                           🔄 Restore
                         </button>
@@ -138,7 +139,7 @@
 </div>
 
 <script>
-  function confirmRestore(filename) {
+  function confirmRestore(form, filename) {
     const doubleCheck = confirm(
       "🛑 CRITICAL ACTION REQUIRED:\n\n" +
       "You are about to restore the system to database snapshot: [" + filename + "].\n" +
@@ -148,7 +149,9 @@
     if (!doubleCheck) return false;
     
     const tripleCheck = prompt("Type 'CONFIRM RESTORE' in all caps to authorize this action:");
-    return tripleCheck === "CONFIRM RESTORE";
+    if (tripleCheck !== "CONFIRM RESTORE") return false;
+    form.querySelector('input[name="confirm_text"]').value = tripleCheck;
+    return true;
   }
 </script>
 {% endblock %}

@@ -68,12 +68,13 @@ def create_db_backup(db: Session, username: str) -> Backup:
         "--single-transaction",
         "--set-gtid-purged=OFF",
     ]
+    env = os.environ.copy()
     if cfg.mysql_password:
-        cmd.insert(4, f"--password={cfg.mysql_password}")
+        env["MYSQL_PWD"] = cfg.mysql_password
 
     try:
         with open(filepath, "w", encoding="utf-8") as f:
-            result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, timeout=300)
+            result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, timeout=300, env=env)
         if result.returncode != 0:
             error_msg = result.stderr.decode("utf-8", errors="replace").strip()
             raise RuntimeError(f"mysqldump failed: {error_msg}")
@@ -104,6 +105,8 @@ def restore_db_backup(db: Session, backup_id: int) -> Backup:
     backup = db.get(Backup, backup_id)
     if backup is None:
         raise ValueError("Backup record not found.")
+    if backup.status != "Success":
+        raise ValueError("Only successful backups can be restored.")
     path = Path(backup.filepath)
     if not path.exists():
         raise FileNotFoundError(f"Backup file not found: {backup.filepath}")
@@ -117,11 +120,12 @@ def restore_db_backup(db: Session, backup_id: int) -> Backup:
         f"--user={cfg.mysql_user}",
         cfg.mysql_database,
     ]
+    env = os.environ.copy()
     if cfg.mysql_password:
-        cmd.insert(4, f"--password={cfg.mysql_password}")
+        env["MYSQL_PWD"] = cfg.mysql_password
 
     with open(path, "r", encoding="utf-8") as f:
-        result = subprocess.run(cmd, stdin=f, stderr=subprocess.PIPE, timeout=600)
+        result = subprocess.run(cmd, stdin=f, stderr=subprocess.PIPE, timeout=600, env=env)
     if result.returncode != 0:
         error_msg = result.stderr.decode("utf-8", errors="replace").strip()
         raise RuntimeError(f"mysql restore failed: {error_msg}")

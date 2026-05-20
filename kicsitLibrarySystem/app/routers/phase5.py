@@ -11,6 +11,7 @@ from app.database import get_db
 from app.models import User
 from app.permissions import require_permission
 from app.schemas.phase5 import DamagedBookForm, LostBookForm, ReservationForm
+from app.services import settings_service
 from app.services.activity_log_service import write_activity_log
 from app.services.phase5_service import (
     calculated_overdue_fine,
@@ -90,7 +91,19 @@ def reservation_cancel(request: Request, reservation_id: int, reason: str = Form
 def overdue_page(request: Request, q: str | None = None, current_user: User = Depends(require_permission("circulation.manage")), db: Session = Depends(get_db)):
     as_of = date.today()
     records = overdue_records(db, as_of, q)
-    return render(request, "phase5/overdue.html", {"current_user": current_user, "records": records, "q": q or "", "as_of": as_of, "fine_func": calculated_overdue_fine}, "overdue")
+    fine_per_day = settings_service.get_setting_decimal(db, "circulation.fine_per_day", Decimal("10.00"))
+    return render(
+        request,
+        "phase5/overdue.html",
+        {
+            "current_user": current_user,
+            "records": records,
+            "q": q or "",
+            "as_of": as_of,
+            "fine_func": lambda issue, date_value=None: calculated_overdue_fine(issue, date_value, fine_per_day),
+        },
+        "overdue",
+    )
 
 
 @router.post("/overdue/{issue_id}/reminder")
@@ -105,14 +118,16 @@ def send_overdue_reminder(request: Request, issue_id: int, channel: str = Form("
 @router.get("/overdue/export/pdf")
 def overdue_pdf(q: str | None = None, current_user: User = Depends(require_permission("circulation.manage")), db: Session = Depends(get_db)):
     as_of = date.today()
-    data = overdue_pdf_bytes(overdue_records(db, as_of, q), as_of)
+    fine_per_day = settings_service.get_setting_decimal(db, "circulation.fine_per_day", Decimal("10.00"))
+    data = overdue_pdf_bytes(overdue_records(db, as_of, q), as_of, fine_per_day)
     return Response(data, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="overdue-report.pdf"'})
 
 
 @router.get("/overdue/export/excel")
 def overdue_excel(q: str | None = None, current_user: User = Depends(require_permission("circulation.manage")), db: Session = Depends(get_db)):
     as_of = date.today()
-    data = overdue_excel_bytes(overdue_records(db, as_of, q), as_of)
+    fine_per_day = settings_service.get_setting_decimal(db, "circulation.fine_per_day", Decimal("10.00"))
+    data = overdue_excel_bytes(overdue_records(db, as_of, q), as_of, fine_per_day)
     return Response(data, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": 'attachment; filename="overdue-report.xlsx"'})
 
 

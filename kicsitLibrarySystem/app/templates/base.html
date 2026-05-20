@@ -20,12 +20,19 @@
         </div>
       </div>
       <nav class="nav-list">
+        {% if current_user and current_user.has_permission('dashboard.view') %}
         <a class="nav-item {% if active_nav == 'dashboard' or active_nav is not defined %}active{% endif %}" href="/dashboard">Dashboard</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('catalog.manage') %}
         <a class="nav-item {% if active_nav == 'catalog' %}active{% endif %}" href="/catalog">Library Catalog</a>
         <a class="nav-item {% if active_nav == 'copies' %}active{% endif %}" href="/catalog/copies">Book Copies</a>
         <a class="nav-item {% if active_nav == 'catalog_setup' %}active{% endif %}" href="/catalog/setup">Catalog Setup</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('consumers.manage') %}
         <a class="nav-item {% if active_nav == 'consumers' %}active{% endif %}" href="/consumers/students">Students</a>
         <a class="nav-item {% if active_nav == 'employees' %}active{% endif %}" href="/consumers/employees">Employees</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('circulation.manage') %}
         <a class="nav-item {% if active_nav == 'circulation' %}active{% endif %}" href="/circulation/issue">Issue Return</a>
         <a class="nav-item {% if active_nav == 'history' %}active{% endif %}" href="/circulation/history">Issue History</a>
         <a class="nav-item {% if active_nav == 'reservations' %}active{% endif %}" href="/reservations">Reservations</a>
@@ -34,17 +41,24 @@
         <a class="nav-item {% if active_nav == 'lost' %}active{% endif %}" href="/lost-books">Lost Books</a>
         <a class="nav-item {% if active_nav == 'damaged' %}active{% endif %}" href="/damaged-books">Damaged Books</a>
         <a class="nav-item {% if active_nav == 'clearance' %}active{% endif %}" href="/clearance">Student Clearance</a>
-        <a class="nav-item {% if active_nav == 'book_history' %}active{% endif %}" href="/book-history">Book History</a>
-        <a class="nav-item {% if active_nav == 'status_checker' %}active{% endif %}" href="/status-checker">Status Checker</a>
-        <a class="nav-item {% if active_nav == 'reports' %}active{% endif %}" href="/reports">Reports</a>
-        <a class="nav-item {% if active_nav == 'imports' %}active{% endif %}" href="/imports">Imports</a>
-        <a class="nav-item {% if active_nav == 'search' %}active{% endif %}" href="/search">Smart Search</a>
         <a class="nav-item {% if active_nav == 'visits' %}active{% endif %}" href="/visits">Visit Records</a>
         <a class="nav-item {% if active_nav == 'audits' %}active{% endif %}" href="/audits">Audit Records</a>
         <a class="nav-item {% if active_nav == 'inventory' %}active{% endif %}" href="/inventory">Inventory</a>
         <a class="nav-item {% if active_nav == 'arrivals' %}active{% endif %}" href="/arrivals">New Arrivals</a>
         <a class="nav-item {% if active_nav == 'documents' %}active{% endif %}" href="/documents">SOPs and Documents</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('reports.view') %}
         <a class="nav-item {% if active_nav == 'phase8_reports' %}active{% endif %}" href="/phase8-reports">Audit Reports</a>
+        <a class="nav-item {% if active_nav == 'reports' %}active{% endif %}" href="/reports">Reports</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('catalog.manage') %}
+        <a class="nav-item {% if active_nav == 'imports' %}active{% endif %}" href="/imports">Imports</a>
+        <a class="nav-item {% if active_nav == 'book_history' %}active{% endif %}" href="/book-history">Book History</a>
+        <a class="nav-item {% if active_nav == 'status_checker' %}active{% endif %}" href="/status-checker">Status Checker</a>
+        {% endif %}
+        {% if current_user and current_user.has_permission('dashboard.view') %}
+        <a class="nav-item {% if active_nav == 'search' %}active{% endif %}" href="/search">Smart Search</a>
+        {% endif %}
         {% if current_user and current_user.has_permission('settings.manage') %}
         <a class="nav-item {% if active_nav == 'settings' %}active{% endif %}" href="/settings">System Settings</a>
         {% endif %}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -44,6 +44,8 @@ def create_backup_action(
 ) -> RedirectResponse:
     try:
         backup = backup_service.create_db_backup(db, current_user.username)
+        if backup.status != "Success":
+            raise RuntimeError(backup.remarks or "Backup command failed.")
         write_activity_log(
             db,
             request=request,
@@ -63,10 +65,13 @@ def create_backup_action(
 def restore_backup_action(
     request: Request,
     backup_id: int,
+    confirm_text: str = Form(""),
     current_user: User = Depends(require_permission("system.manage_all")),
     db: Session = Depends(get_db),
 ) -> RedirectResponse:
     try:
+        if confirm_text != "CONFIRM RESTORE":
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Restore confirmation text is required.")
         backup = backup_service.restore_db_backup(db, backup_id)
         write_activity_log(
             db,

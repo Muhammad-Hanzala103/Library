@@ -17,6 +17,7 @@ from app.models import (
     BookMaster,
     Category,
     DepartmentCategory,
+    IssueRecord,
     LiteratureCategory,
     Publisher,
     User,
@@ -138,6 +139,12 @@ def ensure_unique_accession(db: Session, accession_number: str, exclude_copy_id:
         raise ValueError("Accession number already exists.")
 
 
+def copy_has_active_issue(db: Session, copy_id: int) -> bool:
+    return db.scalar(
+        select(IssueRecord.id).where(IssueRecord.book_copy_id == copy_id, IssueRecord.status == "Active")
+    ) is not None
+
+
 def save_book_image(upload: UploadFile | None) -> str | None:
     if upload is None or not upload.filename:
         return None
@@ -197,6 +204,12 @@ def soft_delete_book(db: Session, book: BookMaster, reason: str, current_user: U
     if not reason:
         raise ValueError("Deletion reason is required.")
     active_copies = [copy for copy in book.copies if not copy.is_deleted]
+    issued_copies = [copy.accession_number for copy in active_copies if copy_has_active_issue(db, copy.id)]
+    if issued_copies:
+        raise ValueError(
+            "Cannot delete a book while active issues exist for accession number(s): "
+            + ", ".join(issued_copies)
+        )
     for copy in active_copies:
         copy.is_deleted = True
         copy.deleted_reason = reason
@@ -206,6 +219,7 @@ def soft_delete_book(db: Session, book: BookMaster, reason: str, current_user: U
     book.deleted_reason = reason
     book.deleted_by_user_id = current_user.id
     book.deleted_at = datetime.utcnow()
+    book.quantity = 0
     db.add(book)
     db.commit()
 
@@ -246,11 +260,20 @@ def soft_delete_copy(db: Session, copy: BookCopy, reason: str, current_user: Use
     reason = clean_optional(reason)
     if not reason:
         raise ValueError("Deletion reason is required.")
+    if copy_has_active_issue(db, copy.id):
+        raise ValueError("Cannot delete an accession copy while it has an active issue.")
     copy.is_deleted = True
     copy.deleted_reason = reason
     copy.deleted_by_user_id = current_user.id
     copy.deleted_at = datetime.utcnow()
     db.add(copy)
+    db.flush()
+    book = copy.book_master or db.get(BookMaster, copy.book_master_id)
+    if book:
+        book.quantity = db.scalar(
+            select(func.count(BookCopy.id)).where(BookCopy.book_master_id == book.id, BookCopy.is_deleted == False)  # noqa: E712
+        ) or 0
+        db.add(book)
     db.commit()
 
 

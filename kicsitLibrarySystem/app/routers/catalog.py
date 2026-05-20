@@ -330,9 +330,24 @@ def delete_copy_action(
     reason: str = Form(...),
     current_user: User = Depends(require_permission("catalog.manage")),
     db: Session = Depends(get_db),
-) -> RedirectResponse:
+) -> RedirectResponse | HTMLResponse:
     copy = get_copy_or_404(db, copy_id)
-    soft_delete_copy(db, copy, reason, current_user)
+    try:
+        soft_delete_copy(db, copy, reason, current_user)
+    except ValueError as exc:
+        return render(
+            request,
+            "catalog/book_copies.html",
+            {
+                "current_user": current_user,
+                "copies": search_copies(db),
+                "books": search_books(db),
+                "q": "",
+                "error": str(exc),
+                "active_nav": "copies",
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
     write_activity_log(
         db,
         request=request,

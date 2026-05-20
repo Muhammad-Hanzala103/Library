@@ -29,6 +29,7 @@ from app.models import (
     Student,
     User,
 )
+from app.services import settings_service
 
 
 @dataclass
@@ -74,8 +75,9 @@ def build_report(db: Session, report_type: str, q: str | None = None, status_fil
         return ReportResult(REPORT_TITLES[report_type], ["Issue No", "Accession", "Book", "Consumer", "Issue Date", "Due Date", "Status", "Receive Date"], rows, filters)
     if report_type == "overdue":
         today = date.today()
+        fine_per_day = settings_service.get_setting_decimal(db, "circulation.fine_per_day", Decimal("10.00"))
         records = db.scalars(select(IssueRecord).options(selectinload(IssueRecord.book_copy), selectinload(IssueRecord.book_master), selectinload(IssueRecord.student), selectinload(IssueRecord.employee)).where(IssueRecord.status == "Active", IssueRecord.due_date < today)).all()
-        rows = [[i.book_copy.accession_number, i.book_master.title, i.student.name if i.student else i.employee.name, i.issue_date, i.due_date, (today - i.due_date).days, Decimal((today - i.due_date).days) * Decimal("10.00")] for i in records]
+        rows = [[i.book_copy.accession_number, i.book_master.title, i.student.name if i.student else i.employee.name, i.issue_date, i.due_date, (today - i.due_date).days, Decimal((today - i.due_date).days) * fine_per_day] for i in records]
         return ReportResult(REPORT_TITLES[report_type], ["Accession", "Book", "Consumer", "Issue Date", "Due Date", "Days", "Fine"], rows, filters)
     if report_type == "fines":
         statement = select(Fine).options(selectinload(Fine.student), selectinload(Fine.employee), selectinload(Fine.book_copy)).order_by(Fine.created_at.desc())
