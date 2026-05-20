@@ -54,7 +54,7 @@ def issue_page(
         "consumer_query": consumer_query or "",
         "accession_number": accession_number or "",
         "issue_date": issue_date,
-        "due_date": default_due_date(issue_date),
+        "due_date": default_due_date(db, issue_date),
         "consumer": None,
         "consumer_active_issues": [],
         "consumer_unpaid_fines": [],

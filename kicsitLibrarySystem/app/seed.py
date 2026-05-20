@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from app.database import SessionLocal
-from app.models import Permission, Role, User
+from app.models import Permission, Role, User, Setting
 from app.models import Category, DepartmentCategory, LiteratureCategory
 from app.utils.security import hash_password
 
@@ -33,6 +33,25 @@ SEED_USERS = [
 ]
 
 DEFAULT_PASSWORD = "ChangeMe@123"
+
+DEFAULT_SETTINGS = [
+    ("circulation.fine_per_day", "10.00", "Daily overdue fine amount (PKR)", "circulation"),
+    ("circulation.student_issue_limit", "3", "Max books a student can borrow at once", "circulation"),
+    ("circulation.faculty_issue_limit", "5", "Max books a faculty member can borrow at once", "circulation"),
+    ("circulation.staff_issue_limit", "3", "Max books a staff member can borrow at once", "circulation"),
+    ("circulation.default_issue_duration", "14", "Default issue duration in days", "circulation"),
+    ("circulation.reservation_expiry_days", "7", "Reservation expiry in days", "circulation"),
+    ("notifications.smtp_host", "smtp.gmail.com", "SMTP server host", "notifications"),
+    ("notifications.smtp_port", "587", "SMTP server port", "notifications"),
+    ("notifications.smtp_username", "library@kicsit.edu.pk", "SMTP server username", "notifications"),
+    ("notifications.smtp_password", "", "SMTP server password", "notifications"),
+    ("notifications.from_email", "library@kicsit.edu.pk", "Sender email address", "notifications"),
+    ("notifications.whatsapp_api_url", "https://api.whatsapp.com/send", "WhatsApp gateway API URL", "notifications"),
+    ("notifications.whatsapp_token", "", "WhatsApp API gateway token", "notifications"),
+    ("backup.backup_directory", "app/uploads/backups", "Directory where backups are saved", "backup"),
+    ("reports.institute_name", "Dr A Q Khan Institute of Computer Sciences and Information Technology (KICSIT)", "Official institute name for headers", "reports"),
+    ("reports.system_name", "KICSIT Library Management System", "System name for display/reports", "reports"),
+]
 
 
 def get_or_create_permission(db, code: str, name: str, module: str, description: str) -> Permission:
@@ -103,6 +122,10 @@ def seed() -> None:
         for name, code in [("Urdu", "URDU"), ("English", "ENGLISH"), ("History", "HISTORY"), ("Islam", "ISLAM")]:
             if db.scalar(select(LiteratureCategory).where(LiteratureCategory.name == name)) is None:
                 db.add(LiteratureCategory(name=name, code=code, description=f"Default literature category: {name}"))
+
+        for key, value, description, category in DEFAULT_SETTINGS:
+            if db.scalar(select(Setting).where(Setting.key == key)) is None:
+                db.add(Setting(key=key, value=value, description=description, category=category))
 
         db.commit()
         print("Seed completed.")

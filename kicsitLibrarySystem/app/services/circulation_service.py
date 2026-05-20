@@ -7,12 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models import BookCopy, BookMaster, Employee, Fine, IssueRecord, ReceiveRecord, Student, User
 from app.schemas.circulation import CONSUMER_TYPES, FINE_STATUSES, RETURN_CONDITIONS, IssueBookForm, ReturnBookForm
-
-
-DEFAULT_FINE_PER_DAY = Decimal("10.00")
-STUDENT_ISSUE_LIMIT = 3
-FACULTY_ISSUE_LIMIT = 5
-STAFF_ISSUE_LIMIT = 3
+from app.services import settings_service
 
 
 def clean_optional(value: str | None) -> str | None:
@@ -31,8 +26,9 @@ def parse_date(value: str | None, fallback: date | None = None) -> date:
     return date.today()
 
 
-def default_due_date(issue_date: date) -> date:
-    return issue_date + timedelta(days=14)
+def default_due_date(db: Session, issue_date: date) -> date:
+    days = settings_service.get_setting_int(db, "circulation.default_issue_duration", 14)
+    return issue_date + timedelta(days=days)
 
 
 def next_number(db: Session, model, field_name: str, prefix: str) -> str:
@@ -111,12 +107,12 @@ def unpaid_fines_for_consumer(db: Session, consumer_type: str, consumer_id: int)
     return db.scalars(statement).all()
 
 
-def issue_limit_for_consumer(consumer_type: str, consumer: Student | Employee) -> int:
+def issue_limit_for_consumer(db: Session, consumer_type: str, consumer: Student | Employee) -> int:
     if consumer_type == "Student":
-        return STUDENT_ISSUE_LIMIT
+        return settings_service.get_setting_int(db, "circulation.student_issue_limit", 3)
     if consumer.employee_type in {"Permanent Faculty", "Visiting Faculty"}:
-        return FACULTY_ISSUE_LIMIT
-    return STAFF_ISSUE_LIMIT
+        return settings_service.get_setting_int(db, "circulation.faculty_issue_limit", 5)
+    return settings_service.get_setting_int(db, "circulation.staff_issue_limit", 3)
 
 
 def validate_issue(db: Session, form: IssueBookForm, consumer: Student | Employee, copy: BookCopy) -> None:
@@ -134,7 +130,7 @@ def validate_issue(db: Session, form: IssueBookForm, consumer: Student | Employe
     if active_issue_for_copy(db, copy.id):
         raise ValueError("This accession number already has an active issue.")
     active_count = len(active_issues_for_consumer(db, form.consumer_type, consumer.id))
-    limit = issue_limit_for_consumer(form.consumer_type, consumer)
+    limit = issue_limit_for_consumer(db, form.consumer_type, consumer)
     if active_count >= limit:
         raise ValueError(f"Issue limit reached. Limit is {limit}.")
     if unpaid_fines_for_consumer(db, form.consumer_type, consumer.id):
@@ -217,7 +213,8 @@ def return_book(db: Session, form: ReturnBookForm, current_user: User) -> Receiv
         raise ValueError("Receive date cannot be before issue date.")
 
     overdue_days = calculate_overdue_days(issue.due_date, form.receive_date)
-    fine_amount = DEFAULT_FINE_PER_DAY * Decimal(overdue_days)
+    fine_per_day = settings_service.get_setting_decimal(db, "circulation.fine_per_day", Decimal("10.00"))
+    fine_amount = fine_per_day * Decimal(overdue_days)
     receive = ReceiveRecord(
         receive_number=next_number(db, ReceiveRecord, "receive_number", "RCV"),
         issue_record_id=issue.id,
