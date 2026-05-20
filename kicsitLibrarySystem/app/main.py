@@ -13,6 +13,8 @@ from app.routers import phase5
 from app.routers import phase6
 from app.routers import phase7
 from app.routers import phase8
+from app.routers import settings as settings_router
+from app.routers import backup as backup_router
 
 
 settings = get_settings()
@@ -31,6 +33,8 @@ def create_app() -> FastAPI:
     app.include_router(phase6.router)
     app.include_router(phase7.router)
     app.include_router(phase8.router)
+    app.include_router(settings_router.router)
+    app.include_router(backup_router.router)
 
     @app.get("/", include_in_schema=False)
     def home() -> RedirectResponse:

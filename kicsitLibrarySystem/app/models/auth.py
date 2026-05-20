@@ -46,6 +46,13 @@ class User(Base):
     roles: Mapped[list["Role"]] = relationship("Role", secondary="userroles", back_populates="users")
     activity_logs: Mapped[list["ActivityLog"]] = relationship("ActivityLog", back_populates="user")
 
+    def has_permission(self, permission_code: str) -> bool:
+        for role in self.roles:
+            for perm in role.permissions:
+                if perm.code == permission_code or perm.code == "system.manage_all":
+                    return True
+        return False
+
 
 class Role(Base):
     __tablename__ = "roles"
