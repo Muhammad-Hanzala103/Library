@@ -2,7 +2,7 @@
 
 | Requirement | Status |
 |---|---|
-| Fresh setup passes | Fail |
+| Fresh setup passes | Partial |
 | Login passes | Blocked |
 | Role permission passes | Partial |
 | Database migration passes | Fail |
@@ -27,10 +27,9 @@
 | Audit visits pass | Partial |
 | Inventory passes | Partial |
 | New arrivals pass | Partial |
-| Activity logs pass | Blocked |
+| Activity logs pass | Partial |
 | Backup restore passes | Fail |
 | Security critical checks pass | Partial |
 | Final demo flow passes | Blocked |
 
 Final decision: Not Ready.
-
