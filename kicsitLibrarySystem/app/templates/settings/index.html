@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - {{ app_name }}{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+  <h2>Global ERP Configuration Console</h2>
+  <p style="color: var(--muted); margin-bottom: 24px; font-size: 14px;">
+    Adjust default parameters for circulation fine limits, SMTP notifications, mysqldump paths, and PDF report layout headers.
+  </p>
+
+  {% if request.query_params.get('msg') %}
+    <div style="background: #ecfdf5; border: 1px solid #10b981; color: #065f46; border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 14px;">
+      ✅ {{ request.query_params.get('msg') }}
+    </div>
+  {% endif %}
+
+  <form action="/settings" method="post" class="data-form">
+    <!-- Category A: Circulation and Fines -->
+    <div class="settings-group">
+      <div class="settings-group-title">I. Circulation, Fines & Limits</div>
+      <div class="settings-grid">
+        <div class="settings-field">
+          <label for="circulation.fine_per_day">Daily Fine Amount (PKR)</label>
+          <input type="number" step="0.01" id="circulation.fine_per_day" name="circulation.fine_per_day" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.fine_per_day') | map(attribute='value') | first }}" required>
+          <p>Overdue penalty charged per book per calendar day.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="circulation.default_issue_duration">Default Issue Duration (Days)</label>
+          <input type="number" id="circulation.default_issue_duration" name="circulation.default_issue_duration" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.default_issue_duration') | map(attribute='value') | first }}" required>
+          <p>Standard borrowing duration before a copy is marked overdue.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="circulation.student_issue_limit">Student Borrowing Limit</label>
+          <input type="number" id="circulation.student_issue_limit" name="circulation.student_issue_limit" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.student_issue_limit') | map(attribute='value') | first }}" required>
+          <p>Maximum number of simultaneous active issues allowed for Students.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="circulation.faculty_issue_limit">Faculty Borrowing Limit</label>
+          <input type="number" id="circulation.faculty_issue_limit" name="circulation.faculty_issue_limit" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.faculty_issue_limit') | map(attribute='value') | first }}" required>
+          <p>Maximum number of simultaneous active issues allowed for Faculty.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="circulation.staff_issue_limit">Staff Borrowing Limit</label>
+          <input type="number" id="circulation.staff_issue_limit" name="circulation.staff_issue_limit" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.staff_issue_limit') | map(attribute='value') | first }}" required>
+          <p>Maximum number of simultaneous active issues allowed for Staff.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="circulation.reservation_expiry_days">Reservation Hold Duration (Days)</label>
+          <input type="number" id="circulation.reservation_expiry_days" name="circulation.reservation_expiry_days" 
+                 value="{{ grouped_settings.circulation | selectattr('key', 'equalto', 'circulation.reservation_expiry_days') | map(attribute='value') | first }}" required>
+          <p>Number of days a reserved copy is held at the counter before cancellation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category B: SMTP & Gateway notifications -->
+    <div class="settings-group">
+      <div class="settings-group-title">II. Notification Server & SMTP Configuration</div>
+      <div class="settings-grid">
+        <div class="settings-field">
+          <label for="notifications.smtp_host">SMTP Server Host</label>
+          <input type="text" id="notifications.smtp_host" name="notifications.smtp_host" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.smtp_host') | map(attribute='value') | first }}">
+          <p>Host address of the outgoing mail server (e.g. smtp.gmail.com).</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="notifications.smtp_port">SMTP Server Port</label>
+          <input type="text" id="notifications.smtp_port" name="notifications.smtp_port" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.smtp_port') | map(attribute='value') | first }}">
+          <p>Standard port used by SMTP (e.g., 587 for TLS, 465 for SSL).</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="notifications.smtp_username">SMTP Username</label>
+          <input type="text" id="notifications.smtp_username" name="notifications.smtp_username" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.smtp_username') | map(attribute='value') | first }}">
+          <p>E-mail account used to login to mail server.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="notifications.smtp_password">SMTP Account Password</label>
+          <input type="password" id="notifications.smtp_password" name="notifications.smtp_password" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.smtp_password') | map(attribute='value') | first }}">
+          <p>E-mail password or app-specific authentication key.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="notifications.from_email">Sender Email Address</label>
+          <input type="email" id="notifications.from_email" name="notifications.from_email" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.from_email') | map(attribute='value') | first }}">
+          <p>E-mail displayed in 'From' headers on notifications.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="notifications.whatsapp_api_url">WhatsApp Gateway API URL</label>
+          <input type="url" id="notifications.whatsapp_api_url" name="notifications.whatsapp_api_url" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.whatsapp_api_url') | map(attribute='value') | first }}">
+          <p>Base endpoint URL for third-party WhatsApp gateway provider.</p>
+        </div>
+
+        <div class="settings-field" style="grid-column: 1 / -1;">
+          <label for="notifications.whatsapp_token">WhatsApp Authentication Token</label>
+          <input type="text" id="notifications.whatsapp_token" name="notifications.whatsapp_token" 
+                 value="{{ grouped_settings.notifications | selectattr('key', 'equalto', 'notifications.whatsapp_token') | map(attribute='value') | first }}">
+          <p>Bearer or query token required by WhatsApp API provider.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category C: Backup Directories -->
+    <div class="settings-group">
+      <div class="settings-group-title">III. Database Storage & Backup Configurations</div>
+      <div class="settings-grid">
+        <div class="settings-field" style="grid-column: 1 / -1;">
+          <label for="backup.backup_directory">Backup Directory File Path</label>
+          <input type="text" id="backup.backup_directory" name="backup.backup_directory" 
+                 value="{{ grouped_settings.backup | selectattr('key', 'equalto', 'backup.backup_directory') | map(attribute='value') | first }}" required>
+          <p>Local filepath relative to workspace or absolute path where database dumps are stored.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category D: PDF & Excel layout headers -->
+    <div class="settings-group">
+      <div class="settings-group-title">IV. Institution & Report Headers</div>
+      <div class="settings-grid">
+        <div class="settings-field">
+          <label for="reports.institute_name">Official Institute Name</label>
+          <input type="text" id="reports.institute_name" name="reports.reports.institute_name" 
+                 value="{{ grouped_settings.reports | selectattr('key', 'equalto', 'reports.institute_name') | map(attribute='value') | first }}" required>
+          <p>Dr A Q Khan Institute official title displayed in PDF report headers.</p>
+        </div>
+
+        <div class="settings-field">
+          <label for="reports.system_name">Official System Display Name</label>
+          <input type="text" id="reports.system_name" name="reports.reports.system_name" 
+                 value="{{ grouped_settings.reports | selectattr('key', 'equalto', 'reports.system_name') | map(attribute='value') | first }}" required>
+          <p>System banner title displayed on application layout headers.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="margin-top: 30px; display: flex; justify-content: flex-end; gap: 12px;">
+      <a href="/dashboard" class="btn" style="background: #64748b; color: white; text-decoration: none; display: flex; align-items: center; padding: 10px 18px; border-radius: 8px;">Cancel</a>
+      <button type="submit" class="btn" style="background: var(--primary); color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; cursor: pointer;">Save Settings Configurations</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

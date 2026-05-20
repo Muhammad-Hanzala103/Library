@@ -1,59 +1,266 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard - {{ app_name }}{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard & Analytics{% endblock %}
 
 {% block content %}
-<section class="metric-grid" aria-label="Phase 1 dashboard metrics">
-  <article class="metric-card">
-    <span>Total Users</span>
-    <strong>{{ metrics.users }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Roles</span>
-    <strong>{{ metrics.roles }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Permissions</span>
-    <strong>{{ metrics.permissions }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Activity Logs</span>
-    <strong>{{ metrics.activity_logs }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Catalog Books</span>
-    <strong>{{ metrics.books }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Accession Copies</span>
-    <strong>{{ metrics.copies }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Students</span>
-    <strong>{{ metrics.students }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Employees</span>
-    <strong>{{ metrics.employees }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Active Issues</span>
-    <strong>{{ metrics.active_issues }}</strong>
-  </article>
-  <article class="metric-card">
-    <span>Unpaid Fines</span>
-    <strong>{{ metrics.unpaid_fines }}</strong>
-  </article>
-  <article class="metric-card"><span>Pending Reservations</span><strong>{{ metrics.reservations }}</strong></article>
-  <article class="metric-card"><span>Lost Cases</span><strong>{{ metrics.lost_books }}</strong></article>
-  <article class="metric-card"><span>Damaged Cases</span><strong>{{ metrics.damaged_books }}</strong></article>
+<!-- Include Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Quick Alerts Dashboard -->
+<section class="glass-panel" aria-label="Quick Alerts">
+  <h2>Quick Alerts & Administrative Notifications</h2>
+  <div class="alerts-grid">
+    <!-- Overdue Holdings -->
+    <article class="alert-box danger">
+      <h3>🚨 Overdue Holdings (Top 5)</h3>
+      <ul>
+        {% for alert in alerts.overdues %}
+          <li>
+            <strong>{{ alert.book_master.title[:20] }}...</strong> ({{ alert.book_copy.accession_number }}) - 
+            {% if alert.student %}Student: {{ alert.student.name }}{% else %}Employee: {{ alert.employee.name }}{% endif %}
+            <br><small style="color: var(--danger)">Due: {{ alert.due_date.strftime("%d %b %Y") }}</small>
+          </li>
+        {% else %}
+          <li style="list-style-type: none; margin-left: -15px;">✅ No overdue books currently.</li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <!-- Pending Reservations -->
+    <article class="alert-box warning">
+      <h3>📅 Reservations Ready for Pickup</h3>
+      <ul>
+        {% for res in alerts.reservations %}
+          <li>
+            <strong>{{ res.book_master.title[:20] }}...</strong> - 
+            {% if res.student %}Student: {{ res.student.name }}{% else %}Employee: {{ res.employee.name }}{% endif %}
+            <br><small style="color: #b45309">Expires: {{ res.expiry_date.strftime("%d %b %Y") }}</small>
+          </li>
+        {% else %}
+          <li style="list-style-type: none; margin-left: -15px;">✅ No reservations ready for pickup.</li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <!-- Low Stock Accession Copies -->
+    <article class="alert-box info">
+      <h3>⚠️ Low Stock Alert (Qty &le; 1)</h3>
+      <ul>
+        {% for item in alerts.low_stock %}
+          <li>
+            <strong>{{ item.title[:25] }}...</strong>
+            <br><small>Copies available: {{ item.quantity }}</small>
+          </li>
+        {% else %}
+          <li style="list-style-type: none; margin-left: -15px;">✅ All titles have sufficient stock.</li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <!-- Pending/Uncollected Fines -->
+    <article class="alert-box success">
+      <h3>💰 Pending Unpaid Fines</h3>
+      <ul>
+        {% for fine in alerts.fines %}
+          <li>
+            <strong>Rs. {{ fine.fine_amount }}</strong> - {{ fine.consumer_type }} 
+            {% if fine.student %}{{ fine.student.name }}{% else %}{{ fine.employee.name }}{% endif %}
+            <br><small>Copy: {{ fine.book_copy.accession_number }} ({{ fine.payment_status }})</small>
+          </li>
+        {% else %}
+          <li style="list-style-type: none; margin-left: -15px;">✅ No pending fines.</li>
+        {% endfor %}
+      </ul>
+    </article>
+  </div>
 </section>
 
+<!-- 22 Premium Metrics Grid grouped by Domain -->
+<h3 style="margin: 30px 0 15px; font-weight: 700; color: var(--primary-dark)">Library Performance Metrics (22 KPIs)</h3>
+
+<!-- Domain A: System & Administration -->
+<h4 style="margin: 0 0 10px; font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em">I. System & Access Controls</h4>
+<section class="metric-grid-premium" aria-label="System Metrics">
+  <article class="metric-card-premium teal">
+    <div class="metric-label">System Users</div>
+    <div class="metric-value">{{ metrics.users }}</div>
+    <div class="metric-desc">Registered accounts</div>
+  </article>
+  <article class="metric-card-premium blue">
+    <div class="metric-label">Access Roles</div>
+    <div class="metric-value">{{ metrics.roles }}</div>
+    <div class="metric-desc">Configured systems roles</div>
+  </article>
+  <article class="metric-card-premium indigo">
+    <div class="metric-label">System Permissions</div>
+    <div class="metric-value">{{ metrics.permissions }}</div>
+    <div class="metric-desc">Granular access codes</div>
+  </article>
+  <article class="metric-card-premium purple">
+    <div class="metric-label">Activity Log Rows</div>
+    <div class="metric-value">{{ metrics.activity_logs }}</div>
+    <div class="metric-desc">System audit logs</div>
+  </article>
+</section>
+
+<!-- Domain B: Collection & Circulation -->
+<h4 style="margin: 20px 0 10px; font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em">II. Catalog & Circulation</h4>
+<section class="metric-grid-premium" aria-label="Catalog & Circulation Metrics">
+  <article class="metric-card-premium teal">
+    <div class="metric-label">Unique Titles</div>
+    <div class="metric-value">{{ metrics.books }}</div>
+    <div class="metric-desc">Distinct catalog items</div>
+  </article>
+  <article class="metric-card-premium blue">
+    <div class="metric-label">Accession Copies</div>
+    <div class="metric-value">{{ metrics.copies }}</div>
+    <div class="metric-desc">Total copies in stock</div>
+  </article>
+  <article class="metric-card-premium emerald">
+    <div class="metric-label">Available Copies</div>
+    <div class="metric-value">{{ metrics.available_copies }}</div>
+    <div class="metric-desc">Ready on library shelves</div>
+  </article>
+  <article class="metric-card-premium amber">
+    <div class="metric-label">Currently Issued</div>
+    <div class="metric-value">{{ metrics.issued_copies }}</div>
+    <div class="metric-desc">Active borrows in field</div>
+  </article>
+  <article class="metric-card-premium indigo">
+    <div class="metric-label">Active Reservations</div>
+    <div class="metric-value">{{ metrics.reserved_books }}</div>
+    <div class="metric-desc">Awaiting pickup/queue</div>
+  </article>
+  <article class="metric-card-premium rose">
+    <div class="metric-label">Overdue Holdings</div>
+    <div class="metric-value">{{ metrics.overdue_books }}</div>
+    <div class="metric-desc">Borrowed past return date</div>
+  </article>
+  <article class="metric-card-premium pink">
+    <div class="metric-label">Lost Book Cases</div>
+    <div class="metric-value">{{ metrics.lost_books }}</div>
+    <div class="metric-desc">Unresolved declarations</div>
+  </article>
+  <article class="metric-card-premium red">
+    <div class="metric-label">Damaged Book Cases</div>
+    <div class="metric-value">{{ metrics.damaged_books }}</div>
+    <div class="metric-desc">Pending repair/clearance</div>
+  </article>
+</section>
+
+<!-- Domain C: Consumers Directory -->
+<h4 style="margin: 20px 0 10px; font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em">III. Consumer Directory</h4>
+<section class="metric-grid-premium" aria-label="Consumer Metrics">
+  <article class="metric-card-premium teal">
+    <div class="metric-label">Students Directory</div>
+    <div class="metric-value">{{ metrics.students }}</div>
+    <div class="metric-desc">Total active student database</div>
+  </article>
+  <article class="metric-card-premium blue">
+    <div class="metric-label">Employees Directory</div>
+    <div class="metric-value">{{ metrics.employees }}</div>
+    <div class="metric-desc">Faculty & staff members</div>
+  </article>
+  <article class="metric-card-premium emerald">
+    <div class="metric-label">Cleared Students</div>
+    <div class="metric-value">{{ metrics.students_cleared }}</div>
+    <div class="metric-desc">Students clear for graduation</div>
+  </article>
+  <article class="metric-card-premium rose">
+    <div class="metric-label">Uncleared Students</div>
+    <div class="metric-value">{{ metrics.students_uncleared }}</div>
+    <div class="metric-desc">Pending returns or fines</div>
+  </article>
+</section>
+
+<!-- Domain D: Quality Audits, Logs & Visits -->
+<h4 style="margin: 20px 0 10px; font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em">IV. Quality Audits, Visits & Finance</h4>
+<section class="metric-grid-premium" aria-label="Quality, Visit & Finance Metrics">
+  <article class="metric-card-premium emerald">
+    <div class="metric-label">Fine Collected Today</div>
+    <div class="metric-value">Rs. {{ "{:.2f}".format(metrics.fine_collected_today) }}</div>
+    <div class="metric-desc">Paid overdue fines today</div>
+  </article>
+  <article class="metric-card-premium amber">
+    <div class="metric-label">Fine Collected (Month)</div>
+    <div class="metric-value">Rs. {{ "{:.2f}".format(metrics.fine_collected_month) }}</div>
+    <div class="metric-desc">Overdue fine total this month</div>
+  </article>
+  <article class="metric-card-premium indigo">
+    <div class="metric-label">New Arrivals (Year)</div>
+    <div class="metric-value">{{ metrics.new_arrivals_year }}</div>
+    <div class="metric-desc">Materials registered this year</div>
+  </article>
+  <article class="metric-card-premium purple">
+    <div class="metric-label">Pending Notifications</div>
+    <div class="metric-value">{{ metrics.pending_notifications }}</div>
+    <div class="metric-desc">Pending SMTP/WhatsApp queues</div>
+  </article>
+  <article class="metric-card-premium blue">
+    <div class="metric-label">Active Audit Cases</div>
+    <div class="metric-value">{{ metrics.audit_records }}</div>
+    <div class="metric-desc">Open internal quality audits</div>
+  </article>
+  <article class="metric-card-premium teal">
+    <div class="metric-label">Active Visit Cases</div>
+    <div class="metric-value">{{ metrics.visit_records }}</div>
+    <div class="metric-desc">Open external panel visits</div>
+  </article>
+</section>
+
+<!-- Analytics Visual Dashboards (5 Chart.js Charts) -->
+<section class="glass-panel" aria-label="Analytics Visualizations">
+  <h2>Interactive Analytical Visualizations (Chart.js)</h2>
+  
+  <div class="dashboard-charts-grid">
+    <!-- Chart 1: Monthly issue trend -->
+    <article class="glass-panel" style="margin-bottom: 0;">
+      <h3 style="margin-top:0">📈 Book Borrowing Monthly Trend (Past Year)</h3>
+      <div style="position: relative; height:250px; width:100%">
+        <canvas id="chartIssues"></canvas>
+      </div>
+    </article>
+
+    <!-- Chart 2: Department-wise books -->
+    <article class="glass-panel" style="margin-bottom: 0;">
+      <h3 style="margin-top:0">📊 Department-wise Catalog Stock</h3>
+      <div style="position: relative; height:250px; width:100%">
+        <canvas id="chartDepts"></canvas>
+      </div>
+    </article>
+    
+    <!-- Chart 3: CS vs CE comparison -->
+    <article class="glass-panel" style="margin-bottom: 0;">
+      <h3 style="margin-top:0">⚖️ CS vs CE Department Stock</h3>
+      <div style="position: relative; height:250px; width:100%">
+        <canvas id="chartCsCe"></canvas>
+      </div>
+    </article>
+
+    <!-- Chart 4: Overdue active borrows trend -->
+    <article class="glass-panel" style="margin-bottom: 0;">
+      <h3 style="margin-top:0">⚠️ Overdue Holdings Trend by Month</h3>
+      <div style="position: relative; height:250px; width:100%">
+        <canvas id="chartOverdues"></canvas>
+      </div>
+    </article>
+
+    <!-- Chart 5: Most issued book titles -->
+    <article class="glass-panel" style="grid-column: 1 / -1; margin-bottom: 0;">
+      <h3 style="margin-top:0">🔥 Top 5 Most Popular Book Titles</h3>
+      <div style="position: relative; height:300px; width:100%">
+        <canvas id="chartMostIssued"></canvas>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- Current User Status & Permissions -->
 <section class="dashboard-grid">
   <article class="panel">
     <div class="panel-header">
-      <h2>Current Access</h2>
+      <h2>Session Information</h2>
       <span>{{ current_user.username }}</span>
     </div>
     <div class="detail-list">
@@ -66,7 +273,7 @@
         <strong>{{ current_user.email }}</strong>
       </div>
       <div>
-        <span>Roles</span>
+        <span>System Roles</span>
         <strong>{{ current_user.roles | map(attribute='name') | join(', ') }}</strong>
       </div>
     </div>
@@ -74,8 +281,8 @@
 
   <article class="panel">
     <div class="panel-header">
-      <h2>Enabled Permissions</h2>
-      <span>{{ permissions | length }}</span>
+      <h2>Active Security Clearances</h2>
+      <span>{{ permissions | length }} codes</span>
     </div>
     <div class="permission-list">
       {% for permission in permissions | sort %}
@@ -85,10 +292,11 @@
   </article>
 </section>
 
+<!-- Recent Activity Log section -->
 <section class="panel">
   <div class="panel-header">
-    <h2>Recent Activity</h2>
-    <span>Latest 8</span>
+    <h2>Recent Activity Audit Log</h2>
+    <span>Latest 10 actions</span>
   </div>
   <div class="table-wrap">
     <table>
@@ -97,24 +305,140 @@
           <th>Time</th>
           <th>Action</th>
           <th>Module</th>
+          <th>User</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
         {% for log in recent_logs %}
         <tr>
-          <td>{{ log.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
-          <td>{{ log.action }}</td>
+          <td>{{ log.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+          <td><span style="font-weight: 700; color: var(--primary)">{{ log.action }}</span></td>
           <td>{{ log.module }}</td>
+          <td>{{ log.user.username if log.user else "System" }}</td>
           <td>{{ log.description or "" }}</td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="4">No activity logged yet.</td>
+          <td colspan="5" style="text-align: center; padding: 20px;">No activity logged yet.</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+
+<!-- JavaScript to Initialize Chart.js -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Colors harmony palette
+    const tealColor = '#0f766e';
+    const tealBg = 'rgba(15, 118, 110, 0.2)';
+    const blueColor = '#2563eb';
+    const blueBg = 'rgba(37, 99, 235, 0.2)';
+    const indigoColor = '#4f46e5';
+    const indigoBg = 'rgba(79, 70, 229, 0.2)';
+    const roseColor = '#f43f5e';
+    const roseBg = 'rgba(244, 63, 94, 0.2)';
+    const amberColor = '#d97706';
+    const amberBg = 'rgba(217, 119, 6, 0.2)';
+    
+    // 1. Monthly issue trend
+    new Chart(document.getElementById('chartIssues'), {
+      type: 'line',
+      data: {
+        labels: {{ charts.issues.labels | tojson | safe }},
+        datasets: [{
+          label: 'Book Issues',
+          data: {{ charts.issues.data | tojson | safe }},
+          borderColor: tealColor,
+          backgroundColor: tealBg,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+
+    // 2. Department-wise books
+    new Chart(document.getElementById('chartDepts'), {
+      type: 'bar',
+      data: {
+        labels: {{ charts.departments.labels | tojson | safe }},
+        datasets: [{
+          label: 'Total Books',
+          data: {{ charts.departments.data | tojson | safe }},
+          backgroundColor: [tealColor, blueColor, indigoColor, amberColor, '#9333ea', '#db2777'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+
+    // 3. CS vs CE
+    new Chart(document.getElementById('chartCsCe'), {
+      type: 'pie',
+      data: {
+        labels: {{ charts.cs_ce.labels | tojson | safe }},
+        datasets: [{
+          data: {{ charts.cs_ce.data | tojson | safe }},
+          backgroundColor: [indigoColor, amberColor]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // 4. Overdue trend
+    new Chart(document.getElementById('chartOverdues'), {
+      type: 'line',
+      data: {
+        labels: {{ charts.overdues.labels | tojson | safe }},
+        datasets: [{
+          label: 'Overdue Books',
+          data: {{ charts.overdues.data | tojson | safe }},
+          borderColor: roseColor,
+          backgroundColor: roseBg,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+
+    // 5. Most issued books
+    new Chart(document.getElementById('chartMostIssued'), {
+      type: 'bar',
+      data: {
+        labels: {{ charts.most_issued.labels | tojson | safe }},
+        datasets: [{
+          label: 'Issues Count',
+          data: {{ charts.most_issued.data | tojson | safe }},
+          backgroundColor: blueColor,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  });
+</script>
 {% endblock %}
