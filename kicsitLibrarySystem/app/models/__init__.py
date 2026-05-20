@@ -14,11 +14,13 @@ from app.models.circulation import Fine, IssueRecord, ReceiveRecord
 from app.models.phase5 import DamagedBook, LostBook, Notification, Reservation
 from app.models.phase7 import ImportBatch, ImportErrorRow
 from app.models.phase8 import AuditRecord, Document, InventoryItem, NewArrival, VisitRecord
+from app.models.settings import Backup, Setting
 
 __all__ = [
     "ActivityLog",
     "AuditRecord",
     "Author",
+    "Backup",
     "BookAuthor",
     "BookCopy",
     "BookMaster",
@@ -42,6 +44,7 @@ __all__ = [
     "Reservation",
     "Role",
     "RolePermission",
+    "Setting",
     "Student",
     "User",
     "UserRole",
