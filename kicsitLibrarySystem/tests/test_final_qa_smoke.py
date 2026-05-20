@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from app.database import Base
 from app.main import app
+from app.seed import ROLE_PERMISSION_CODES, SEED_USERS
 from app.services.phase8_service import validate_upload
 from app.utils.security import create_access_token, decode_access_token, hash_password, verify_password
 
@@ -57,6 +58,23 @@ def test_app_starts_and_public_pages_render():
 
 def test_model_metadata_contains_required_tables():
     assert REQUIRED_TABLES.issubset(set(Base.metadata.tables))
+
+
+def test_required_demo_roles_are_seeded():
+    required_roles = {
+        "Super Admin",
+        "Admin",
+        "Librarian",
+        "Assistant Librarian",
+        "Student",
+        "Faculty",
+        "Staff",
+        "Auditor",
+        "Read Only Viewer",
+    }
+    assert required_roles.issubset(set(ROLE_PERMISSION_CODES))
+    seeded_role_names = {role_name for *_user_fields, role_name in SEED_USERS}
+    assert required_roles.issubset(seeded_role_names)
 
 
 def test_password_hash_and_jwt_round_trip():

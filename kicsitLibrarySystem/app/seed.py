@@ -23,6 +23,11 @@ ROLE_PERMISSION_CODES = {
     "Admin": ["dashboard.view", "users.manage", "settings.manage", "reports.view", "logs.view"],
     "Librarian": ["dashboard.view", "catalog.manage", "consumers.manage", "circulation.manage", "reports.view", "logs.view"],
     "Assistant Librarian": ["dashboard.view", "circulation.manage", "reports.view"],
+    "Student": ["dashboard.view"],
+    "Faculty": ["dashboard.view"],
+    "Staff": ["dashboard.view"],
+    "Auditor": ["dashboard.view", "reports.view", "logs.view"],
+    "Read Only Viewer": ["dashboard.view", "reports.view"],
 }
 
 SEED_USERS = [
@@ -30,6 +35,11 @@ SEED_USERS = [
     ("admin", "admin@kicsit.local", "Admin", "Admin"),
     ("librarian", "librarian@kicsit.local", "Librarian", "Librarian"),
     ("assistant", "assistant@kicsit.local", "Assistant Librarian", "Assistant Librarian"),
+    ("student", "student@kicsit.local", "Student User", "Student"),
+    ("faculty", "faculty@kicsit.local", "Faculty User", "Faculty"),
+    ("staff", "staff@kicsit.local", "Staff User", "Staff"),
+    ("auditor", "auditor@kicsit.local", "Auditor User", "Auditor"),
+    ("readonly", "readonly@kicsit.local", "Read Only Viewer", "Read Only Viewer"),
 ]
 
 DEFAULT_PASSWORD = "ChangeMe@123"
