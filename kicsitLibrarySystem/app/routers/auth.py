@@ -22,7 +22,7 @@ templates = Jinja2Templates(directory="app/templates")
 def login_page(
     request: Request,
     current_user: User | None = Depends(get_optional_current_user),
-) -> HTMLResponse | RedirectResponse:
+):
     settings = get_settings()
     if current_user:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
@@ -38,7 +38,7 @@ def login(
     username_or_email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
-) -> RedirectResponse | HTMLResponse:
+):
     settings = get_settings()
     user = authenticate_user(db, username_or_email.strip(), password)
     if user is None:

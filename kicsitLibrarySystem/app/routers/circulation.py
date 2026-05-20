@@ -85,7 +85,7 @@ def issue_action(
     remarks: str | None = Form(None),
     current_user: User = Depends(require_permission("circulation.manage")),
     db: Session = Depends(get_db),
-) -> RedirectResponse | HTMLResponse:
+):
     try:
         form = IssueBookForm(
             consumer_type=consumer_type,
@@ -170,7 +170,7 @@ def return_action(
     remarks: str | None = Form(None),
     current_user: User = Depends(require_permission("circulation.manage")),
     db: Session = Depends(get_db),
-) -> RedirectResponse | HTMLResponse:
+):
     try:
         form = ReturnBookForm(
             accession_number=accession_number,

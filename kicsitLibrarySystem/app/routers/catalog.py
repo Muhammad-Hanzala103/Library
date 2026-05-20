@@ -330,7 +330,7 @@ def delete_copy_action(
     reason: str = Form(...),
     current_user: User = Depends(require_permission("catalog.manage")),
     db: Session = Depends(get_db),
-) -> RedirectResponse | HTMLResponse:
+):
     copy = get_copy_or_404(db, copy_id)
     try:
         soft_delete_copy(db, copy, reason, current_user)
@@ -596,7 +596,7 @@ def delete_book_action(
     reason: str = Form(...),
     current_user: User = Depends(require_permission("catalog.manage")),
     db: Session = Depends(get_db),
-) -> RedirectResponse | HTMLResponse:
+):
     book = get_book_or_404(db, book_id)
     try:
         soft_delete_book(db, book, reason, current_user)
